@@ -5,12 +5,20 @@
 #include "src/graph/Vertex.h"
 #include "src/graph/Graph.h"
 #include "src/graph/shortest_path/Dijkstra.h"
-
+#include <thread>
 
 typedef std::vector<std::vector<graph::Vertex *>> Grid;
 
 int clamp(int x, int min, int max) {
     return std::min(std::max(x, min), max);
+}
+
+void run_and_color(Graph &graph, graph::Vertex* start, graph::Vertex* end, sf::Color &on_path){
+    Dijkstra::dijkstra(graph, *start);
+    graph::Vertex *current = end;
+    while ((current = current->pred)) {
+        current->color = on_path;
+    }
 }
 
 int main() {
@@ -112,12 +120,9 @@ int main() {
                         } else if (!end) {
                             end = grid[x][y];
                             end->color = end_color;
+                            std::thread t1(run_and_color,std::ref(*graph), start, end,std::ref(on_path));
+                            t1.detach();
 
-                            Dijkstra::dijkstra(*graph, *start);
-                            graph::Vertex *current = end;
-                            while ((current = current->pred)) {
-                                current->color = on_path;
-                            }
                         }
                     }
                     break;

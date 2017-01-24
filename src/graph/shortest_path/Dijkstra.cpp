@@ -5,6 +5,7 @@
 
 #include <queue>
 #include <set>
+#include <thread>
 #include "Dijkstra.h"
 
 
@@ -29,6 +30,8 @@ void Dijkstra::dijkstra(Graph &graph, graph::Vertex &src) {
             pos++;
         }
         graph::Vertex *u = Q[min_pos];
+        u->color = sf::Color::White;
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
         Q.erase(Q.begin() + min_pos);
 
         S.push_back(u);
