@@ -4,6 +4,10 @@
 
 #include "Vertex.h"
 
-Vertex::Vertex(float x, float y) : position(x, y) {}
+namespace graph {
+    Vertex::Vertex() {}
+    Vertex::Vertex(float x, float y) : position(x, y) {}
 
-Vertex::Vertex(sf::Vector2f pos) : position(pos) {}
+    Vertex::Vertex(sf::Vector2f pos) : position(pos) {}
+
+}

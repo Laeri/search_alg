@@ -9,15 +9,20 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics/Color.hpp>
 
-class Vertex {
-public:
-    sf::Vector2f position;
-    sf::Color color;
-    Vertex(float x, float y);
-    Vertex(sf::Vector2f pos);
-private:
+namespace graph {
+    class Vertex {
+    public:
+        sf::Vector2f position;
+        sf::Color color;
+        float distance = 0;
+        Vertex* pred = nullptr;
+        Vertex(float x, float y);
 
-};
+        Vertex(sf::Vector2f pos);
+        Vertex();
+    private:
 
+    };
+}
 
 #endif //SEARCH_ALG_VERTEX_H

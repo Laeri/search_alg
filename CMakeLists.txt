@@ -3,7 +3,7 @@ project(search_alg)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES main.cpp src/graph/Graph.cpp src/graph/Graph.h src/graph/Vertex.cpp src/graph/Vertex.h)
+set(SOURCE_FILES main.cpp src/graph/Graph.cpp src/graph/Graph.h src/graph/Vertex.cpp src/graph/Vertex.h src/graph/shortest_path/Dijkstra.h src/graph/shortest_path/Dijkstra.cpp)
 add_executable(search_alg ${SOURCE_FILES})
 
 # Detect and add SFML

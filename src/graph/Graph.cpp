@@ -14,19 +14,30 @@ Graph::~Graph() {
     }
 }
 
-void Graph::add(Vertex *vertex) {
+void Graph::add(graph::Vertex *vertex) {
     vertices.push_back(vertex);
-    adj.push_back(std::vector<std::pair<int, int>>());
+    adj.push_back(std::vector<std::pair<int, float>>());
 }
 
-void Graph::bi_connect(Vertex *va, Vertex *vb, int weight) {
+void Graph::bi_connect(graph::Vertex *va, graph::Vertex *vb, float weight) {
     int v1 = index_of(va);
     int v2 = index_of(vb);
-    adj[v1].push_back(std::make_pair(v2, weight));
-    adj[v2].push_back(std::make_pair(v1, weight));
+    bool already_connected = false;
+    for (auto a: adj[v1]) {
+        if (a.first == v2) already_connected = true;
+    }
+    if (!already_connected)
+        adj[v1].push_back(std::make_pair(v2, weight));
+    already_connected = false;
+
+    for (auto a: adj[v2]) {
+        if (a.first == v1) already_connected = true;
+    }
+    if (!already_connected)
+        adj[v2].push_back(std::make_pair(v1, weight));
 }
 
-bool Graph::connected(Vertex &va, Vertex &vb) {
+bool Graph::connected(graph::Vertex &va, graph::Vertex &vb) {
     auto it_a = std::find(vertices.begin(), vertices.end(), &va);
     auto it_b = std::find(vertices.begin(), vertices.end(), &vb);
     if (it_a == vertices.end() || it_b == vertices.end()) {
@@ -50,11 +61,26 @@ bool Graph::connected(Vertex &va, Vertex &vb) {
     return false;
 }
 
-int Graph::index_of(Vertex *vertex) {
+int Graph::index_of(graph::Vertex *vertex) {
     auto it = std::find(vertices.begin(), vertices.end(), vertex);
     /*
     if(it_a == vertices.end()){
         return -1;
     }*/
     return std::distance(vertices.begin(), it);
+}
+
+VertexList Graph::get_vertices() {
+    return vertices;
+}
+
+ADJ_V Graph::adj_of(graph::Vertex *vertex) {
+    int i = 0;
+    for (auto v:vertices) {
+        if (v == vertex) {
+            return adj[i];
+        }
+        i++;
+    }
+    return ADJ_V();
 }

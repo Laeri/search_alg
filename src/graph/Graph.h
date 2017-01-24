@@ -8,25 +8,28 @@
 #include <vector>
 #include "Vertex.h"
 
-typedef std::vector<std::pair<int, int>> ADJ_V;
+typedef std::vector<std::pair<int, float>> ADJ_V;
 typedef std::vector<ADJ_V> Adjacency;
-typedef std::vector<Vertex *> VertexList;
+typedef std::vector<graph::Vertex *> VertexList;
 
 class Graph {
 private:
     Adjacency adj;
     VertexList vertices;
-    int index_of(Vertex *vertex);
+    int index_of(graph::Vertex *vertex);
 public:
     Graph();
 
     ~Graph();
 
-    void add(Vertex *vertex);
+    void add(graph::Vertex *vertex);
 
-    void bi_connect(Vertex *va, Vertex *vb, int weight);
+    void bi_connect(graph::Vertex *va, graph::Vertex *vb, float weight);
 
-    bool connected(Vertex &va, Vertex &vb);
+    bool connected(graph::Vertex &va, graph::Vertex &vb);
+
+    VertexList get_vertices();
+    ADJ_V adj_of(graph::Vertex *);
 
 
 };
