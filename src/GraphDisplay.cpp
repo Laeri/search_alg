@@ -37,11 +37,11 @@ void color(graph::Vertex *end, sf::Color &on_path) {
 }
 
 void run_and_color(Grid &grid, Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path) {
-     //bellman_ford::bellman_ford(graph, *start);
-   // Dijkstra::dijkstra(graph, *start);
-   // dfs::dfs_search(graph, *start);
-   // dfs::dfs_it(graph, *start);
-    dfs::dfs_maze(grid, graph, *start);
+    //bellman_ford::bellman_ford(graph, *start);
+    Dijkstra::dijkstra(graph, *start);
+    // dfs::dfs_search(graph, *start);
+    // dfs::dfs_it(graph, *start);
+    // dfs::dfs_maze(grid, graph, *start);
     color(end, on_path);
 }
 
@@ -107,13 +107,27 @@ void GraphDisplay::run() {
                             start = grid[x][y];
                             start->color = start_color;
                             start->type = graph::Type::start;
-                        } else if (!end && (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl) ||
-                                            sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RControl))) {
+                        } else if (!end) {
                             end = grid[x][y];
                             end->type = graph::Type::end;
                             end->color = end_color;
-                            std::thread t1(run_and_color,std::ref(grid), std::ref(*graph), start, end, std::ref(on_path));
+                            std::thread t1(run_and_color, std::ref(grid), std::ref(*graph), start, end,
+                                           std::ref(on_path));
                             t1.detach();
+                        } else {
+                            end->type = graph::Type::free;
+                            end->color = free_color;
+                            graph::Vertex *path_v = end;
+                            while ((path_v = path_v->pred)) {
+                                if (path_v->type == graph::Type::start) break;
+                                path_v->type = graph::Type::free;
+                                path_v->color = free_color;
+                            }
+
+                            end = grid[x][y];
+                            end->type = graph::Type::end;
+                            end->color = end_color;
+                            color(end, on_path);
                         }
                     } else {
                         int x = event.mouseButton.x;
