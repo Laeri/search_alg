@@ -12,7 +12,8 @@
 namespace dfs {
     void dfs_search(Graph &graph, graph::Vertex &vertex);
     void dfs_rec(Graph &graph, graph::Vertex &current);
-    void dfs_it(Grid &grid,Graph &graph, graph::Vertex &vertex);
+    void dfs_it(Graph &graph, graph::Vertex &vertex);
+    void dfs_maze(Grid &grid,Graph &graph, graph::Vertex &vertex);
 }
 
 

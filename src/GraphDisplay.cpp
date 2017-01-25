@@ -40,7 +40,8 @@ void run_and_color(Grid &grid, Graph &graph, graph::Vertex *start, graph::Vertex
      //bellman_ford::bellman_ford(graph, *start);
    // Dijkstra::dijkstra(graph, *start);
    // dfs::dfs_search(graph, *start);
-    dfs::dfs_it(grid, graph, *start);
+   // dfs::dfs_it(graph, *start);
+    dfs::dfs_maze(grid, graph, *start);
     color(end, on_path);
 }
 

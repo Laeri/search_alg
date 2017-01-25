@@ -70,7 +70,7 @@ int Graph::index_of(graph::Vertex *vertex) {
     return std::distance(vertices.begin(), it);
 }
 
-VertexList Graph::get_vertices() {
+VertexList& Graph::get_vertices() {
     return vertices;
 }
 

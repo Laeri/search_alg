@@ -27,7 +27,7 @@ public:
 
     bool connected(graph::Vertex &va, graph::Vertex &vb);
 
-    VertexList get_vertices();
+    VertexList& get_vertices();
     Adjacency& get_adjacencies();
     ADJ_V &adj_of(graph::Vertex *);
     void remove_adj_to(graph::Vertex *vertex);
