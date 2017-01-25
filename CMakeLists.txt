@@ -3,7 +3,7 @@ project(search_alg)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES main.cpp src/graph/Graph.cpp src/graph/Graph.h src/graph/Vertex.cpp src/graph/Vertex.h src/graph/shortest_path/Dijkstra.h src/graph/shortest_path/Dijkstra.cpp src/graph/shortest_path/BellmanFord.h src/graph/shortest_path/BellmanFord.cpp src/Command.cpp src/Command.h src/DeleteConnectionAction.cpp src/DeleteConnectionAction.h src/GraphDisplay.cpp src/GraphDisplay.h)
+set(SOURCE_FILES main.cpp src/graph/Graph.cpp src/graph/Graph.h src/graph/Vertex.cpp src/graph/Vertex.h src/graph/shortest_path/Dijkstra.h src/graph/shortest_path/Dijkstra.cpp src/graph/shortest_path/BellmanFord.h src/graph/shortest_path/BellmanFord.cpp src/Command.cpp src/Command.h src/DeleteConnectionAction.cpp src/DeleteConnectionAction.h src/GraphDisplay.cpp src/GraphDisplay.h src/graph/Type.h src/GridDrawer.cpp src/GridDrawer.h)
 add_executable(search_alg ${SOURCE_FILES})
 
 # Detect and add SFML

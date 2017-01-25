@@ -11,7 +11,7 @@
 void bellman_ford::bellman_ford(Graph &graph, graph::Vertex &src) {
     Dijkstra::init_single_source(graph, src);
 
-    Adjacency adj = graph.get_adjacencies();
+    Adjacency &adj = graph.get_adjacencies();
     for(int i = 0; i < graph.get_vertices().size()-1; i++){
         int v1 = 0;
         for(auto &a: adj){
@@ -20,6 +20,7 @@ void bellman_ford::bellman_ford(Graph &graph, graph::Vertex &src) {
                 graph::Vertex * v = graph.get_vertices()[pair.first];
                 if(v->distance > u->distance+pair.second){
                     graph.get_vertices()[pair.first]->color = sf::Color::Cyan;
+                    graph.get_vertices()[pair.first]->type = graph::Type::being_processed;
                     std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 }
                 Dijkstra::relax(u,v,pair.second);

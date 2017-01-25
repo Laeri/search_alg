@@ -10,7 +10,7 @@ DeleteConnectionAction::DeleteConnectionAction(Graph &graph, sf::Vector2i grid_p
 }
 
 void DeleteConnectionAction::do_action() {
-
+    node->type = graph::Type::occupied;
     adj_node =  std::vector<std::pair<int, float>>(graph->adj_of(node).begin(), graph->adj_of(node).end());
     graph->adj_of(node).clear();
     //graph->remove_adj_to(node);
@@ -33,6 +33,7 @@ void DeleteConnectionAction::do_action() {
 }
 
 void DeleteConnectionAction::undo_action() {
+    node->type = graph::Type::free;
     graph->adj_of(node).insert(graph->adj_of(node).begin(), adj_node.begin(), adj_node.end());
     for(auto &mapping: adj_other){
         int v_index = mapping.first;

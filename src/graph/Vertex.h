@@ -8,6 +8,7 @@
 
 #include <SFML/System.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include "Type.h"
 
 namespace graph {
     class Vertex {
@@ -15,11 +16,17 @@ namespace graph {
         sf::Vector2f position;
         sf::Color color;
         float distance = 0;
-        Vertex* pred = nullptr;
+        Type type = Type::free;
+
+        Vertex *pred = nullptr;
+
         Vertex(float x, float y);
 
         Vertex(sf::Vector2f pos);
+
         Vertex();
+
+
     private:
 
     };

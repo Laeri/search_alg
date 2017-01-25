@@ -31,7 +31,10 @@ void Dijkstra::dijkstra(Graph &graph, graph::Vertex &src) {
             pos++;
         }
         graph::Vertex *u = Q[min_pos];
-        u->color = sf::Color::White;
+        if((u->type != graph::Type::start) && (u->type != graph::Type::end) && (u->type != graph::Type::occupied)) {
+            u->color = sf::Color::White;
+            u->type = graph::Type::being_processed;
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
         Q.erase(Q.begin() + min_pos);
 
