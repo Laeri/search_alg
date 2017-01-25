@@ -6,6 +6,7 @@
 #include <queue>
 #include <set>
 #include <thread>
+#include <iostream>
 #include "Dijkstra.h"
 
 
@@ -23,7 +24,7 @@ void Dijkstra::dijkstra(Graph &graph, graph::Vertex &src) {
         int pos = 0;
         int min_pos = -1;
         for (auto &v: Q) {
-            if (v->distance < min_dist) {
+            if (v->distance <= min_dist) {
                 min_pos = pos;
                 min_dist = v->distance;
             }
