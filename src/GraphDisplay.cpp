@@ -54,7 +54,7 @@ void GraphDisplay::run() {
     sf::Color end_color = sf::Color(255, 0, 100);
     //sf::Color on_path = sf::Color(0, 255, 255);
     sf::Color on_path = sf::Color::Black;
-    std::shared_ptr<Graph> graph = std::make_shared<Graph>();
+    graph = std::make_shared<Graph>();
     int side_length = 16; // in pixels
     float half_length = side_length / 2.f;
     int grid_width = SCREEN_WIDTH / side_length;
@@ -63,23 +63,9 @@ void GraphDisplay::run() {
     Grid grid = Grid(grid_width, std::vector<graph::Vertex *>(grid_height));
 
 
-    for (auto y = 0; y < grid_height; y++) {
-        for (auto x = 0; x < grid_width; x++) {
-            graph::Vertex *vertex = new graph::Vertex(x * side_length, y * side_length);
-            vertex->color = free_color;
-            grid[x][y] = vertex;
-            graph->add(vertex);
-        }
-    }
+    init_grid_graph(grid ,free_color, side_length, grid_width, grid_height);
 
-    std::vector<std::pair<int, int>> neighbours = {{-1, 0},
-                                                   {1,  1},
-                                                   {-1, 1},
-                                                   {1,  -1},
-                                                   {-1, -1},
-                                                   {1,  0},
-                                                   {0,  1},
-                                                   {0,  -1}};
+
 
     for (auto i = 0; i < grid_width; i++) {
         for (auto j = 0; j < grid_height; j++) {
@@ -169,7 +155,27 @@ void GraphDisplay::run() {
         }
         window.clear();
 
-        for (int i = 0; i < grid.size(); i++) {
+        draw_grid(window, circle, rectangleShape, half_length, grid);
+
+        draw_connections(window, line, half_length);
+
+        window.display();
+    }
+}
+
+void GraphDisplay::draw_connections(sf::RenderWindow &window,sf::Vertex *line, float half_length) const {
+    for (auto &vertex: graph->get_vertices()) {
+            for (auto adj: graph->adj_of(vertex)) {
+                line[0].position = vertex->position + sf::Vector2f(half_length, half_length);
+                line[1].position = graph->get_vertices()[adj.first]->position + sf::Vector2f(half_length, half_length);
+                window.draw(line, 2, sf::Lines);
+            }
+        }
+}
+
+void GraphDisplay::draw_grid(sf::RenderWindow &window, sf::CircleShape &circle, sf::RectangleShape &rectangleShape,
+                             float half_length, const Grid &grid) const {
+    for (int i = 0; i < grid.size(); i++) {
             for (int j = 0; j < grid[0].size(); j++) {
                 circle.setPosition(grid[i][j]->position + sf::Vector2f(half_length, half_length));
                 rectangleShape.setPosition(grid[i][j]->position);
@@ -178,15 +184,16 @@ void GraphDisplay::run() {
                 window.draw(circle);
             }
         }
+}
 
-        for (auto &vertex: graph->get_vertices()) {
-            for (auto adj: graph->adj_of(vertex)) {
-                line[0].position = vertex->position + sf::Vector2f(half_length, half_length);
-                line[1].position = graph->get_vertices()[adj.first]->position + sf::Vector2f(half_length, half_length);
-                window.draw(line, 2, sf::Lines);
-            }
+void GraphDisplay::init_grid_graph(Grid &grid, const sf::Color &free_color, int side_length, int grid_width, int grid_height) const {
+    for (auto y = 0; y < grid_height; y++) {
+        for (auto x = 0; x < grid_width; x++) {
+            graph::Vertex *vertex = new graph::Vertex(x * side_length, y * side_length);
+            vertex->color = free_color;
+            grid[x][y] = vertex;
+            graph->add(vertex);
         }
-        window.display();
     }
 }
 
