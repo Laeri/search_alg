@@ -6,6 +6,7 @@
 #include "src/graph/Graph.h"
 #include "src/graph/shortest_path/BellmanFord.h"
 #include "src/graph/shortest_path/Dijkstra.h"
+#include "src/DeleteConnectionAction.h"
 #include <thread>
 
 typedef std::vector<std::vector<graph::Vertex *>> Grid;
@@ -14,12 +15,17 @@ int clamp(int x, int min, int max) {
     return std::min(std::max(x, min), max);
 }
 
-void run_and_color(Graph &graph, graph::Vertex* start, graph::Vertex* end, sf::Color &on_path){
-    bellman_ford::bellman_ford(graph, *start);
+void color(graph::Vertex *end, sf::Color &on_path){
     graph::Vertex *current = end;
     while ((current = current->pred)) {
         current->color = on_path;
     }
+}
+
+void run_and_color(Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path) {
+    //bellman_ford::bellman_ford(graph, *start);
+    Dijkstra::dijkstra(graph,*start);
+    color(end, on_path);
 }
 
 int main() {
@@ -28,7 +34,7 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Search Algorithms");
     sf::CircleShape circle(1);
     circle.setFillColor(sf::Color::Black);
-    circle.setOrigin(circle.getGlobalBounds().width/2, circle.getGlobalBounds().height/2);
+    circle.setOrigin(circle.getGlobalBounds().width / 2, circle.getGlobalBounds().height / 2);
     sf::RectangleShape rectangleShape({2, 2});
     rectangleShape.setOutlineThickness(1);
     rectangleShape.setOutlineColor(sf::Color::Black);
@@ -40,8 +46,8 @@ int main() {
     sf::Color taken_color = sf::Color(100, 100, 255);
     sf::Color start_color = sf::Color(255, 0, 0);
     sf::Color end_color = sf::Color(255, 0, 100);
-    sf::Color on_path = sf::Color(0, 255, 255);
-
+    //sf::Color on_path = sf::Color(0, 255, 255);
+    sf::Color on_path = sf::Color::Black;
     std::shared_ptr<Graph> graph = std::make_shared<Graph>();
     int side_length = 16; // in pixels
     float half_length = side_length / 2.f;
@@ -84,10 +90,6 @@ int main() {
     graph::Vertex *start = nullptr;
     graph::Vertex *end = nullptr;
 
-    /* start = grid[0][0];
-     end = grid[1][1];
-     Dijkstra::dijkstra(*graph, *start);
- */
 
     while (window.isOpen()) {
         sf::Event event;
@@ -121,7 +123,7 @@ int main() {
                         } else if (!end) {
                             end = grid[x][y];
                             end->color = end_color;
-                            std::thread t1(run_and_color,std::ref(*graph), start, end,std::ref(on_path));
+                            std::thread t1(run_and_color, std::ref(*graph), start, end, std::ref(on_path));
                             t1.detach();
 
                         }
@@ -130,7 +132,7 @@ int main() {
                 case sf::Event::MouseButtonReleased:
                     break;
                 case sf::Event::MouseMoved:
-                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)&& !(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))) {
 
                         int x = event.mouseMove.x;
                         int y = event.mouseMove.y;
@@ -138,6 +140,8 @@ int main() {
                         y *= (1.f / side_length);
                         if (x >= 0 && y >= 0 && x < grid.size() && y < grid[0].size()) {
                             grid[x][y]->color = taken_color;
+                            DeleteConnectionAction delete_action(*graph, sf::Vector2i(x, y), grid[x][y]);
+                            delete_action.do_action();
                         }
                     }
                     break;
@@ -147,7 +151,7 @@ int main() {
 
         for (int i = 0; i < grid.size(); i++) {
             for (int j = 0; j < grid[0].size(); j++) {
-                circle.setPosition(grid[i][j]->position+ sf::Vector2f(half_length, half_length));
+                circle.setPosition(grid[i][j]->position + sf::Vector2f(half_length, half_length));
                 rectangleShape.setPosition(grid[i][j]->position);
                 rectangleShape.setFillColor(grid[i][j]->color);
                 window.draw(rectangleShape);

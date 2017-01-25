@@ -30,7 +30,8 @@ public:
 
     VertexList get_vertices();
     Adjacency get_adjacencies();
-    ADJ_V adj_of(graph::Vertex *);
+    ADJ_V &adj_of(graph::Vertex *);
+    void remove_adj_to(graph::Vertex *vertex);
 
 
 };

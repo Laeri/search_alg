@@ -74,7 +74,7 @@ VertexList Graph::get_vertices() {
     return vertices;
 }
 
-ADJ_V Graph::adj_of(graph::Vertex *vertex) {
+ADJ_V& Graph::adj_of(graph::Vertex *vertex) {
     int i = 0;
     for (auto v:vertices) {
         if (v == vertex) {
@@ -82,9 +82,24 @@ ADJ_V Graph::adj_of(graph::Vertex *vertex) {
         }
         i++;
     }
-    return ADJ_V();
+    throw std::runtime_error("Vertex is not part of graph.");
 }
 
 Adjacency Graph::get_adjacencies() {
     return adj;
+}
+
+void Graph::remove_adj_to(graph::Vertex *vertex) {
+    int v = index_of(vertex);
+    for (auto &edges: adj) {
+        std::vector<std::pair<int, float>>::iterator it = edges.begin();
+        while((it != edges.end())){
+            if(it->first == v){
+                it = edges.erase(it);
+                //edges.erase(it++);  // alternatively,
+            } else {
+                ++it;
+            }
+        }
+    }
 }
