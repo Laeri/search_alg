@@ -36,8 +36,8 @@ void color(graph::Vertex *end, sf::Color &on_path) {
 }
 
 void run_and_color(Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path) {
-    // bellman_ford::bellman_ford(graph, *start);
-    Dijkstra::dijkstra(graph, *start);
+     bellman_ford::bellman_ford(graph, *start);
+   // Dijkstra::dijkstra(graph, *start);
     color(end, on_path);
 }
 

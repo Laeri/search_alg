@@ -19,8 +19,10 @@ void bellman_ford::bellman_ford(Graph &graph, graph::Vertex &src) {
                 graph::Vertex * u =  graph.get_vertices()[v1];
                 graph::Vertex * v = graph.get_vertices()[pair.first];
                 if(v->distance > u->distance+pair.second){
-                    graph.get_vertices()[pair.first]->color = sf::Color::Cyan;
-                    graph.get_vertices()[pair.first]->type = graph::Type::being_processed;
+                    if((v->type != graph::Type::start) && (v->type != graph::Type::end) && (v->type != graph::Type::occupied)) {
+                        v->color = sf::Color::White;
+                        v->type = graph::Type::being_processed;
+                    }
                     std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 }
                 Dijkstra::relax(u,v,pair.second);
