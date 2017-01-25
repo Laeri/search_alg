@@ -15,6 +15,7 @@
 #include "DeleteConnectionAction.h"
 #include "graph/shortest_path/BellmanFord.h"
 #include "GridDrawer.h"
+#include "graph/shortest_path/DFS.h"
 
 
 GraphDisplay::GraphDisplay() {}
@@ -36,8 +37,9 @@ void color(graph::Vertex *end, sf::Color &on_path) {
 }
 
 void run_and_color(Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path) {
-     bellman_ford::bellman_ford(graph, *start);
+     //bellman_ford::bellman_ford(graph, *start);
    // Dijkstra::dijkstra(graph, *start);
+    dfs::dfs_search(graph, *start);
     color(end, on_path);
 }
 
