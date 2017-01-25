@@ -7,10 +7,12 @@
 
 #include "../Vertex.h"
 #include "../Graph.h"
+#include "../../GraphDisplay.h"
 
 namespace dfs {
     void dfs_search(Graph &graph, graph::Vertex &vertex);
     void dfs_rec(Graph &graph, graph::Vertex &current);
+    void dfs_it(Grid &grid,Graph &graph, graph::Vertex &vertex);
 }
 
 

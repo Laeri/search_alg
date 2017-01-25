@@ -36,10 +36,11 @@ void color(graph::Vertex *end, sf::Color &on_path) {
     }
 }
 
-void run_and_color(Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path) {
+void run_and_color(Grid &grid, Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path) {
      //bellman_ford::bellman_ford(graph, *start);
    // Dijkstra::dijkstra(graph, *start);
-    dfs::dfs_search(graph, *start);
+   // dfs::dfs_search(graph, *start);
+    dfs::dfs_it(grid, graph, *start);
     color(end, on_path);
 }
 
@@ -110,7 +111,7 @@ void GraphDisplay::run() {
                             end = grid[x][y];
                             end->type = graph::Type::end;
                             end->color = end_color;
-                            std::thread t1(run_and_color, std::ref(*graph), start, end, std::ref(on_path));
+                            std::thread t1(run_and_color,std::ref(grid), std::ref(*graph), start, end, std::ref(on_path));
                             t1.detach();
                         }
                     } else {
