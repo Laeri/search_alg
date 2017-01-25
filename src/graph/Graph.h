@@ -16,7 +16,6 @@ class Graph {
 private:
     Adjacency adj;
     VertexList vertices;
-    int index_of(graph::Vertex *vertex);
 public:
     Graph();
 
@@ -29,10 +28,10 @@ public:
     bool connected(graph::Vertex &va, graph::Vertex &vb);
 
     VertexList get_vertices();
-    Adjacency get_adjacencies();
+    Adjacency& get_adjacencies();
     ADJ_V &adj_of(graph::Vertex *);
     void remove_adj_to(graph::Vertex *vertex);
-
+    int index_of(graph::Vertex *vertex);
 
 };
 

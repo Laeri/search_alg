@@ -85,7 +85,7 @@ ADJ_V& Graph::adj_of(graph::Vertex *vertex) {
     throw std::runtime_error("Vertex is not part of graph.");
 }
 
-Adjacency Graph::get_adjacencies() {
+Adjacency& Graph::get_adjacencies() {
     return adj;
 }
 

@@ -5,3 +5,6 @@
 #include "Command.h"
 
 Command::Command() {}
+
+void Command::do_action() {}
+void Command::undo_action() {}

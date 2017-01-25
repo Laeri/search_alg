@@ -15,7 +15,7 @@ int clamp(int x, int min, int max) {
     return std::min(std::max(x, min), max);
 }
 
-void color(graph::Vertex *end, sf::Color &on_path){
+void color(graph::Vertex *end, sf::Color &on_path) {
     graph::Vertex *current = end;
     while ((current = current->pred)) {
         current->color = on_path;
@@ -23,8 +23,8 @@ void color(graph::Vertex *end, sf::Color &on_path){
 }
 
 void run_and_color(Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path) {
-    //bellman_ford::bellman_ford(graph, *start);
-    Dijkstra::dijkstra(graph,*start);
+    //  bellman_ford::bellman_ford(graph, *start);
+    Dijkstra::dijkstra(graph, *start);
     color(end, on_path);
 }
 
@@ -55,6 +55,11 @@ int main() {
     int grid_height = SCREEN_HEIGHT / side_length;
     rectangleShape.setSize({side_length, side_length});
     Grid grid(grid_width, std::vector<graph::Vertex *>(grid_height));
+
+
+    std::vector<Command *> commands;
+
+
     for (auto y = 0; y < grid_height; y++) {
         for (auto x = 0; x < grid_width; x++) {
             graph::Vertex *vertex = new graph::Vertex(x * side_length, y * side_length);
@@ -107,6 +112,13 @@ int main() {
                         }
                         start = nullptr;
                         end = nullptr;
+                        for (auto &command: commands) {
+                            command->undo_action();
+                        }
+                        for (auto command: commands) {
+                            delete command;
+                        }
+                        commands.clear();
                     }
                     break;
                 case sf::Event::KeyReleased:
@@ -120,19 +132,34 @@ int main() {
                         if (!start) {
                             start = grid[x][y];
                             start->color = start_color;
-                        } else if (!end) {
+                        } else if (!end && (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl) ||
+                                            sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RControl))) {
                             end = grid[x][y];
                             end->color = end_color;
                             std::thread t1(run_and_color, std::ref(*graph), start, end, std::ref(on_path));
                             t1.detach();
-
+                        }
+                    } else {
+                        int x = event.mouseButton.x;
+                        int y = event.mouseButton.y;
+                        x *= (1.f / side_length);
+                        y *= (1.f / side_length);
+                        if (x >= 0 && y >= 0 && x < grid.size() && y < grid[0].size()) {
+                            grid[x][y]->color = taken_color;
+                            Command *delete_action = new DeleteConnectionAction(*graph,
+                                                                                               sf::Vector2i(x, y),
+                                                                                               grid[x][y]);
+                            delete_action->do_action();
+                            commands.push_back(delete_action);
                         }
                     }
                     break;
                 case sf::Event::MouseButtonReleased:
                     break;
                 case sf::Event::MouseMoved:
-                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)&& !(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))) {
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) &&
+                        !(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) ||
+                          sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))) {
 
                         int x = event.mouseMove.x;
                         int y = event.mouseMove.y;
@@ -140,8 +167,9 @@ int main() {
                         y *= (1.f / side_length);
                         if (x >= 0 && y >= 0 && x < grid.size() && y < grid[0].size()) {
                             grid[x][y]->color = taken_color;
-                            DeleteConnectionAction delete_action(*graph, sf::Vector2i(x, y), grid[x][y]);
-                            delete_action.do_action();
+                            Command *delete_action = new DeleteConnectionAction(*graph, sf::Vector2i(x, y), grid[x][y]);
+                            delete_action->do_action();
+                            commands.push_back(delete_action);
                         }
                     }
                     break;

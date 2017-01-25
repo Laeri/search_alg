@@ -12,8 +12,8 @@ class Command {
 public:
     Command();
 
-    virtual void do_action() = 0;
-    virtual void undo_action() = 0;
+    virtual void do_action();
+    virtual void undo_action();
 
 };
 
