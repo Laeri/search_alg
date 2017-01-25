@@ -84,3 +84,7 @@ ADJ_V Graph::adj_of(graph::Vertex *vertex) {
     }
     return ADJ_V();
 }
+
+Adjacency Graph::get_adjacencies() {
+    return adj;
+}

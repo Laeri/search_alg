@@ -7,8 +7,6 @@
 #ifndef SEARCH_ALG_DIJKSTRA_H
 #define SEARCH_ALG_DIJKSTRA_H
 
-#endif //SEARCH_ALG_DIJKSTRA_H
-
 namespace Dijkstra {
     struct compare {
         bool operator()(const graph::Vertex *u, const graph::Vertex *v) {
@@ -22,3 +20,6 @@ namespace Dijkstra {
 
     void init_single_source(Graph &graph, graph::Vertex &src);
 }
+
+#endif //SEARCH_ALG_DIJKSTRA_H
+

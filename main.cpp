@@ -4,6 +4,7 @@
 #include <memory>
 #include "src/graph/Vertex.h"
 #include "src/graph/Graph.h"
+#include "src/graph/shortest_path/BellmanFord.h"
 #include "src/graph/shortest_path/Dijkstra.h"
 #include <thread>
 
@@ -14,7 +15,7 @@ int clamp(int x, int min, int max) {
 }
 
 void run_and_color(Graph &graph, graph::Vertex* start, graph::Vertex* end, sf::Color &on_path){
-    Dijkstra::dijkstra(graph, *start);
+    bellman_ford::bellman_ford(graph, *start);
     graph::Vertex *current = end;
     while ((current = current->pred)) {
         current->color = on_path;
