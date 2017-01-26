@@ -16,6 +16,7 @@
 #include "graph/shortest_path/BellmanFord.h"
 #include "GridDrawer.h"
 #include "graph/shortest_path/DFS.h"
+#include "graph/shortest_path/GreedyBestFirstSearch.h"
 
 
 GraphDisplay::GraphDisplay() {}
@@ -38,10 +39,11 @@ void color(graph::Vertex *end, sf::Color &on_path) {
 
 void run_and_color(Grid &grid, Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path) {
     //bellman_ford::bellman_ford(graph, *start);
-    Dijkstra::dijkstra(graph, *start);
+   // Dijkstra::dijkstra(graph, *start);
     // dfs::dfs_search(graph, *start);
     // dfs::dfs_it(graph, *start);
     // dfs::dfs_maze(grid, graph, *start);
+    best_first::best_first_search(graph, *start, *end);
     color(end, on_path);
 }
 
@@ -208,6 +210,7 @@ void GraphDisplay::init_grid_graph(Grid &grid, const sf::Color &free_color, int 
 void GraphDisplay::reset(const sf::Color &free_color, Graph &graph, graph::Vertex *&start,
                          graph::Vertex *&end) {
     for (auto &v :graph.get_vertices()) {
+        v->pred = nullptr;
         v->color = free_color;
         v->type = graph::Type::free;
     }
