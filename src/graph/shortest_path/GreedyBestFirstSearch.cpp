@@ -12,30 +12,24 @@ void best_first::best_first_search(Graph &graph, graph::Vertex &src, graph::Vert
     std::priority_queue<graph::Vertex *, std::vector<graph::Vertex *>, compare> open;
     src.pred = &src;
 
-    for (auto v: graph.get_vertices()) {
-        sf::Vector2f dPos = v->position - goal.position;
-        float distance = std::sqrt(dPos.x * dPos.x + dPos.y * dPos.y);
-        v->distance = distance;
-    }
+
     open.push(&src);
 
     graph::Vertex *current;
     while (!open.empty()) {
-        // no edges are relaxed!
-       /* std::make_heap(const_cast<graph::Vertex**>(&open.top()),
-                       const_cast<graph::Vertex**>(&open.top()) + open.size(),
-                       compare());
-        *///
+        // no edges are relaxed, therefore open.top() always returns smallest element
         current = open.top();
         open.pop();
         if (current == &goal) {
-            std::cout << "Goal found" << std::endl;
             break;
         } else {
             for (auto &pair: graph.adj_of(current)) {
                 auto node = graph.get_vertices()[pair.first];
                 if(!node->pred){
                     node->pred = current;
+                    sf::Vector2f dPos = node->position - goal.position;
+                    float distance = std::sqrt(dPos.x * dPos.x + dPos.y * dPos.y);
+                    node->distance = distance;
                     open.push(node);
                 }
                 if((node->type != graph::Type::start) && (node->type != graph::Type::end) && (node->type != graph::Type::occupied)) {
