@@ -23,6 +23,7 @@
 #include "graph/shortest_path/GraphSearch.h"
 #include "graph/shortest_path/DijkstraSearch.h"
 #include "graph/shortest_path/DFSSearch.h"
+#include "graph/shortest_path/BFSSearch.h"
 
 
 GraphDisplay::GraphDisplay() {}
@@ -74,6 +75,7 @@ void GraphDisplay::run() {
 
     search_func["Dijkstra"] = new DijkstraSearch();
     search_func["DFS"] = new DFSSearch();
+    search_func["BFS"] = new BFSSearch();
     auto current_search = search_func.begin();
     sf::CircleShape circle(1);
     circle.setFillColor(sf::Color::Black);
