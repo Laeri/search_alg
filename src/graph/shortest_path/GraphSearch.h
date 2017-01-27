@@ -14,6 +14,14 @@
 enum class Event {
     Current, Relax
 };
+
+struct compare {
+    bool operator()(const graph::Vertex* u, const graph::Vertex* v){
+        // > because first element in vector shall be minimum element when using std::sort
+        return u->distance < v->distance;
+    }
+};
+
 typedef std::function<void(Event, graph::Vertex *)> Function;
 
 class GraphSearch {

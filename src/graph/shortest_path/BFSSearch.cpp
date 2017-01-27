@@ -8,7 +8,9 @@
 
 void BFSSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) {
     src.pred = &src;
+    // use standard queue because costs do not matter in BFS
     std::queue<graph::Vertex *> node_stack;
+    // use dummy value for predecessor, because src should not be added again to stack
     node_stack.push(&src);
     graph::Vertex *current;
     while (!node_stack.empty()) {

@@ -4,38 +4,27 @@
 
 #include <thread>
 #include "DijkstraSearch.h"
+#include "GBestFirstSearch.h"
 
 void DijkstraSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) {
     init_single_src(graph, src);
-    std::vector<graph::Vertex *> S;
     std::vector<graph::Vertex *> Q;
 
     for (graph::Vertex *vertex: graph.get_vertices()) {
         Q.push_back(vertex);
     }
+    std::sort(Q.begin(), Q.end(), compare());
     while (!Q.empty()) {
-
-        float min_dist = std::numeric_limits<float>::max();
-        int pos = 0;
-        int min_pos = -1;
-        for (auto &v: Q) {
-            if (v->distance <= min_dist) {
-                min_pos = pos;
-                min_dist = v->distance;
-            }
-            pos++;
-        }
-        graph::Vertex *u = Q[min_pos];
+        graph::Vertex *u = Q[0];
         callback(Event::Current, u);
+        Q.erase(Q.begin());
 
-        //std::this_thread::sleep_for(std::chrono::milliseconds(2));
-        Q.erase(Q.begin() + min_pos);
-
-        S.push_back(u);
         for (std::pair<int, float> pair: graph.adj_of(u)) {
             graph::Vertex *v = graph.get_vertices()[pair.first];
             float weight = pair.second;
+            bool resort_queue = v->distance > u->distance + weight;
             relax(*u, *v, weight);
+            if (resort_queue) std::sort(Q.begin(), Q.end(), compare());
         }
 
     }

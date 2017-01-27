@@ -8,7 +8,13 @@
 
 
 void GBestFirstSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) {
+
+    /* use standard priority queue because node distances
+    * do not change after insertion
+    */
+
     std::priority_queue<graph::Vertex *, std::vector<graph::Vertex *>, compare> open;
+    // set predecessor to dummy value (points back to itself)
     src.pred = &src;
     open.push(&src);
     graph::Vertex *current;
@@ -30,9 +36,9 @@ void GBestFirstSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &g
                     open.push(node);
                     callback(Event::Relax, node);
                 }
-              //  std::this_thread::sleep_for(std::chrono::milliseconds(2));
             }
         }
     }
+    // reset predecessor of src
     src.pred = nullptr;
 }

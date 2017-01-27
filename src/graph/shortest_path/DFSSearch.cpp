@@ -16,16 +16,14 @@ void DFSSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) {
         v_stack.pop();
         callback(Event::Current, current);
         std::vector<std::pair<int, float>> tmp = std::vector<std::pair<int, float>>(*(&graph.adj_of(current)));
-        while (!tmp.empty()) {
-            int i = std::rand() % tmp.size();
-            graph::Vertex *branch = graph.get_vertices()[tmp[i].first];
-
+        std::random_shuffle(tmp.begin(), tmp.end());
+        for (auto &adj: tmp) {
+            graph::Vertex *branch = graph.get_vertices()[adj.first];
             if (!branch->pred) {
                 v_stack.push(branch);
                 branch->pred = current;
                 callback(Event::Relax, branch);
             }
-            tmp.erase(tmp.begin() + i);
         }
     }
     src.pred = nullptr; // remove dummy connection

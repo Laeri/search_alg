@@ -8,12 +8,6 @@
 
 #include "GraphSearch.h"
 
-struct compare {
-    bool operator()(const graph::Vertex* u, const graph::Vertex* v){
-        return u->distance > v->distance;
-    }
-};
-
 class GBestFirstSearch : public GraphSearch {
 public:
     void search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) override;
