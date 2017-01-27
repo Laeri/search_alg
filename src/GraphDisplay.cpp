@@ -86,9 +86,7 @@ void GraphDisplay::run() {
     init_grid_graph(grid, free_color, side_length, grid_width, grid_height);
     Graph &g = *graph;
 
-    std::thread maze_thread(create_maze, std::ref(grid), std::ref(*graph), 0,0,2);
-    maze_thread.detach();
-    //connect_grid(grid_width, grid_height, grid);
+    connect_grid(grid_width, grid_height, grid);
 
 
     graph::Vertex *start = nullptr;
@@ -107,6 +105,19 @@ void GraphDisplay::run() {
                         window.close();
                     } else if (event.key.code == sf::Keyboard::R) {
                         reset(free_color, *graph, start, end);
+                        for(auto &adj: graph->get_adjacencies()){
+                            adj.clear();
+                        }
+                        connect_grid(grid_width,grid_height, grid);
+                    } else if(event.key.code == sf::Keyboard::M){
+                        reset(free_color, *graph, start, end);
+                        sf::Clock clock;
+                        srand(time((time_t *) clock.getElapsedTime().asMilliseconds()));
+                        for(auto &adj: graph->get_adjacencies()){
+                            adj.clear();
+                        }
+                        std::thread maze_thread(create_maze, std::ref(grid), std::ref(*graph), 0,0,2);
+                        maze_thread.detach();
                     }
                     break;
                 case sf::Event::KeyReleased:
