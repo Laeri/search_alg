@@ -15,30 +15,23 @@ void GridDrawer::draw_connections(Graph &graph, sf::RenderWindow &window, float 
     }
 }
 
-void GridDrawer::draw_grid(sf::RenderWindow &window, sf::CircleShape &circle, sf::RectangleShape &rectangleShape,
-                           float half_length, const Grid &grid) {
+void GridDrawer::draw_grid(sf::RenderWindow &window, sf::RectangleShape &rectangleShape, const Grid &grid) {
     for (int i = 0; i < grid.size(); i++) {
         for (int j = 0; j < grid[0].size(); j++) {
-            circle.setPosition(grid[i][j]->position + sf::Vector2f(half_length, half_length));
             rectangleShape.setPosition(grid[i][j]->position);
             sf::Color rect_color = colors[grid[i][j]->type];
             rectangleShape.setFillColor(rect_color);
             window.draw(rectangleShape);
-            window.draw(circle);
         }
     }
 }
 
 void GridDrawer::draw(Graph &graph, sf::RenderWindow &window, Grid &grid, float half_length) {
-    draw_grid(window, circle, rectangleShape, half_length, grid);
+    draw_grid(window, rectangleShape, grid);
     draw_connections(graph, window, half_length);
 }
 
 GridDrawer::GridDrawer(std::map<graph::Type, sf::Color> colors, float side_length) : colors(colors) {
-    // shapes to draw grid and graph
-    circle = sf::CircleShape(1.0f);
-    circle.setFillColor(sf::Color::Black);
-    circle.setOrigin(circle.getGlobalBounds().width / 2, circle.getGlobalBounds().height / 2);
     rectangleShape = sf::RectangleShape();
     rectangleShape.setOutlineThickness(1);
     rectangleShape.setOutlineColor(sf::Color::Black);

@@ -11,7 +11,6 @@
 class GridDrawer {
 
 private:
-    sf::CircleShape circle;
     sf::RectangleShape rectangleShape;
     sf::Vertex line[2] = {sf::Vertex(), sf::Vertex()};
     std::map<graph::Type, sf::Color> colors;
@@ -19,7 +18,7 @@ private:
     void draw_connections(Graph &graph, sf::RenderWindow &window, float half_length);
 
     void
-    draw_grid(sf::RenderWindow &window, sf::CircleShape &circle, sf::RectangleShape &rectangleShape, float half_length,
+    draw_grid(sf::RenderWindow &window, sf::RectangleShape &rectangleShape,
               const Grid &grid);
 
 public:

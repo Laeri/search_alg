@@ -78,45 +78,62 @@ void GraphDisplay::run() {
                     window.close();
                     break;
                 case sf::Event::KeyPressed:
-                    if (event.key.code == sf::Keyboard::Escape) {
-                        window.close();
-                    } else if (event.key.code == sf::Keyboard::R) { // reset map, clear connections
-                        reset(colors[graph::Type::free], *graph, start, end);
-                        for (auto &adj: graph->get_adjacencies()) {
-                            adj.clear();
-                        }
-                        connect_grid(grid_width, grid_height, grid);
-                    } else if (event.key.code == sf::Keyboard::T) { // reset map/graph but keep obstacles
-                        for (auto &v :graph->get_vertices()) {
-                            if (v->type != graph::Type::occupied) {
-                                v->pred = nullptr;
-                                v->type = graph::Type::free;
+                    switch (event.key.code) {
+                        case sf::Keyboard::Escape:
+                            window.close();
+                            break;
+                            // reset map, clear connections
+                        case sf::Keyboard::R:
+                            reset(*graph, start, end);
+                            for (auto &adj: graph->get_adjacencies()) {
+                                adj.clear();
                             }
-                        }
-                        start = nullptr;
-                        end = nullptr;
-                    } else if (event.key.code == sf::Keyboard::M) { // create a maze with dfs on sepearate thread
-                        createMaze(colors[graph::Type::free], grid, start, end);
-                    } else if (event.key.code == sf::Keyboard::Right) { // cycle through search algorithms
-                        current_search++;
-                        if (current_search == search_func.end()) current_search = search_func.begin();
-                    } else if (event.key.code == sf::Keyboard::Left) { // cycle through search algorithms
-                        if (current_search == search_func.begin()) current_search = search_func.end();
-                        current_search--;
-                    } else if (event.key.code == sf::Keyboard::L) { // lock search algorithm in other thread
-                        current_search->second->locked = true;
-                    } else if (event.key.code == sf::Keyboard::U) { // unlock search algorithm in other thread
-                        current_search->second->locked = false;
-                        current_search->second->var.notify_one();
-                    } else if (event.key.code ==
-                               sf::Keyboard::P) { // change lock step mode (if true every step in algorithm gets locked)
-                        *lock_step = *lock_step ? false : true;
-                        if (!*lock_step) {
+                            connect_grid(grid_width, grid_height, grid);
+                            break;
+                            // reset map/graph but keep obstacles
+                        case sf::Keyboard::T:
+                            for (auto &v :graph->get_vertices()) {
+                                if (v->type != graph::Type::occupied) {
+                                    v->pred = nullptr;
+                                    v->type = graph::Type::free;
+                                }
+                            }
+                            start = nullptr;
+                            end = nullptr;
+                            break;
+                            // create a maze with dfs on sepearate thread
+                        case sf::Keyboard::M:
+                            create_maze(colors[graph::Type::free], grid, start, end);
+                            break;
+                            // cycle through search algorithms
+                        case sf::Keyboard::Right:
+                            current_search++;
+                            if (current_search == search_func.end()) current_search = search_func.begin();
+                            break;
+                            // cycle through search algorithms
+                        case sf::Keyboard::Left:
+                            if (current_search == search_func.begin()) current_search = search_func.end();
+                            current_search--;
+                            break;
+                            // lock search algorithm in other thread
+                        case sf::Keyboard::L:
+                            current_search->second->locked = true;
+                            break;
+                            // unlock search algorithm in other thread
+                        case sf::Keyboard::U:
                             current_search->second->locked = false;
                             current_search->second->var.notify_one();
-                        }
+                            break;
+                        case sf::Keyboard::P:
+                            // change lock step mode (if true every step in algorithm gets locked)
+                            *lock_step = *lock_step ? false : true;
+                            if (!*lock_step) {
+                                current_search->second->locked = false;
+                                current_search->second->var.notify_one();
+                            }
+                            break;
                     }
-                    break;
+
                 case sf::Event::KeyReleased:
                     break;
                 case sf::Event::MouseButtonPressed:
@@ -137,7 +154,7 @@ void GraphDisplay::run() {
                         } else { // if start and end have been set and CTRL is still down, choose new end node and color shortest path again
                             end->type = graph::Type::free;
                             graph::Vertex *path_v = end;
-                            // remove color of old path
+                            // remove old path / set its type to Type::free
                             while ((path_v = path_v->pred)) {
                                 if (path_v->type == graph::Type::start) break;
                                 path_v->type = graph::Type::free;
@@ -150,12 +167,7 @@ void GraphDisplay::run() {
                         int x = event.mouseButton.x;
                         int y = event.mouseButton.y;
                         if (inside_grid(side_length, grid, x, y)) {
-                            grid[x][y]->type = graph::Type::occupied;
-                            Command *delete_action = new DeleteConnectionAction(*graph,
-                                                                                sf::Vector2i(x, y),
-                                                                                grid[x][y]);
-                            delete_action->do_action();
-                            commands.push_back(delete_action);
+                            deleteConnections(grid, x, y);
                         }
                     }
                     break;
@@ -167,14 +179,10 @@ void GraphDisplay::run() {
                     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) &&
                         !(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) ||
                           sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))) {
-
                         int x = event.mouseMove.x;
                         int y = event.mouseMove.y;
                         if (inside_grid(side_length, grid, x, y)) {
-                            grid[x][y]->type = graph::Type::occupied;
-                            Command *delete_action = new DeleteConnectionAction(*graph, sf::Vector2i(x, y), grid[x][y]);
-                            delete_action->do_action();
-                            commands.push_back(delete_action);
+                            deleteConnections(grid, x,y);
                         }
                     }
                     break;
@@ -182,10 +190,18 @@ void GraphDisplay::run() {
         }
         window.clear();
         gridDrawer.draw(*graph, window, grid, half_length);
-        drawText();
-        window.draw(text);
+        drawText(window);
         window.display();
     }
+}
+
+GraphDisplay::deleteConnections(const Grid &grid, int x, int y) {
+    grid[x][y]->type = graph::Type::occupied;
+    Command *delete_action = new DeleteConnectionAction(*graph,
+                                                        sf::Vector2i(x, y),
+                                                        grid[x][y]);
+    delete_action->do_action();
+    commands.push_back(delete_action);
 }
 
 void GraphDisplay::createText() {
@@ -197,20 +213,22 @@ void GraphDisplay::createText() {
     text.setColor(sf::Color::Black);
 }
 
-void GraphDisplay::createMaze(const sf::Color &free_color, Grid &grid, graph::Vertex *&start, graph::Vertex *&end) {
-    reset(free_color, *graph, start, end);
+void GraphDisplay::create_maze(const sf::Color &free_color, Grid &grid, graph::Vertex *&start, graph::Vertex *&end) {
+    reset(*graph, start, end);
     sf::Clock clock;
     srand(time((time_t *) clock.getElapsedTime().asMilliseconds()));
+    // remove all connections in order that the maze can "break" walls
     for (auto &adj: graph->get_adjacencies()) {
         adj.clear();
     }
-    std::thread maze_thread(create_maze, ref(grid), std::ref(*graph), 0, 0, 2);
+    std::thread maze_thread(run_maze, ref(grid), std::ref(*graph), 0, 0, 2);
     maze_thread.detach();
 }
 
-void GraphDisplay::drawText() {
+void GraphDisplay::drawText(sf::RenderWindow &window) {
     text.setPosition(10, 10);
     text.setString(current_search->first);
+    window.draw(text);
 }
 
 void GraphDisplay::createSearches() {
@@ -259,7 +277,7 @@ void GraphDisplay::init_grid_graph(Grid &grid, const sf::Color &free_color, int 
 }
 
 
-void GraphDisplay::reset(const sf::Color &free_color, Graph &graph, graph::Vertex *&start,
+void GraphDisplay::reset(Graph &graph, graph::Vertex *&start,
                          graph::Vertex *&end) {
     for (auto &v :graph.get_vertices()) {
         v->pred = nullptr;
@@ -300,7 +318,7 @@ void run_search(GraphSearch *search, Graph &graph, graph::Vertex *start, graph::
     color(end);
 }
 
-void create_maze(Grid &grid, Graph &graph, int start_x, int start_y, int step_size) {
+void run_maze(Grid &grid, Graph &graph, int start_x, int start_y, int step_size) {
     MazeCreator mazeCreator;
     mazeCreator.createMaze(grid, graph, start_x, start_y, step_size);
 }

@@ -43,7 +43,7 @@ public:
 
     void close();
 
-    void reset(const sf::Color &free_color, Graph &graph, graph::Vertex *&start, graph::Vertex *&end);
+    void reset(Graph &graph, graph::Vertex *&start, graph::Vertex *&end);
 
 
     bool in_bounds(int side_length, int &x, int &y) const;
@@ -63,15 +63,17 @@ public:
 
     void createSearches();
 
-    void drawText();
+    void drawText(sf::RenderWindow &window);
 
-    void createMaze(const sf::Color &free_color, Grid &grid, graph::Vertex *&start, graph::Vertex *&end);
+    void create_maze(const sf::Color &free_color, Grid &grid, graph::Vertex *&start, graph::Vertex *&end);
 
     void createText();
+
+    void deleteConnections(const Grid &grid, int x, int y);
 };
 
 void color(graph::Vertex *end);
 void run_search(GraphSearch *search, Graph &graph, graph::Vertex *start, graph::Vertex *end);
 int clamp(int x, int min, int max);
-void create_maze(Grid &grid, Graph &graph, int start_x, int start_y, int step_size);
+void run_maze(Grid &grid, Graph &graph, int start_x, int start_y, int step_size);
 #endif //SEARCH_ALG_GRAPHDISPLAY_H
