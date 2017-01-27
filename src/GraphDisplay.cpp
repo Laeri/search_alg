@@ -20,6 +20,8 @@
 #include "graph/shortest_path/BFS.h"
 #include "graph/shortest_path/AStar.h"
 #include "graph/MazeCreator.h"
+#include "graph/shortest_path/GraphSearch.h"
+#include "graph/shortest_path/DijkstraSearch.h"
 
 
 GraphDisplay::GraphDisplay() {}
@@ -52,6 +54,11 @@ void run_and_color(Grid &grid, Graph &graph, graph::Vertex *start, graph::Vertex
     color(end, on_path);
 }
 
+void run_search(GraphSearch *search, Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path) {
+    search->search(graph, *start);
+    color(end, on_path);
+}
+
 void create_maze(Grid &grid, Graph &graph, int start_x, int start_y, int step_size) {
     MazeCreator mazeCreator;
     mazeCreator.createMaze(grid, graph, start_x, start_y, step_size);
@@ -59,9 +66,13 @@ void create_maze(Grid &grid, Graph &graph, int start_x, int start_y, int step_si
 
 void GraphDisplay::run() {
     sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Search Algorithms");
-
     GridDrawer gridDrawer;
 
+    std::map<std::string, GraphSearch*> search_func;
+
+
+    search_func["Dijkstra"] = new DijkstraSearch();
+    auto current_search = search_func.begin();
     sf::CircleShape circle(1);
     circle.setFillColor(sf::Color::Black);
     circle.setOrigin(circle.getGlobalBounds().width / 2, circle.getGlobalBounds().height / 2);
@@ -91,7 +102,6 @@ void GraphDisplay::run() {
 
     graph::Vertex *start = nullptr;
     graph::Vertex *end = nullptr;
-
 
     while (window.isOpen()) {
         sf::Event event;
@@ -146,7 +156,7 @@ void GraphDisplay::run() {
                             end = grid[x][y];
                             end->type = graph::Type::end;
                             end->color = end_color;
-                            std::thread t1(run_and_color, std::ref(grid), std::ref(*graph), start, end,
+                            std::thread t1(run_search, current_search->second, std::ref(*graph), start, end,
                                            std::ref(on_path));
                             t1.detach();
                         } else {
