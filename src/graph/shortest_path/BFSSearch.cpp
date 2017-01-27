@@ -14,17 +14,11 @@ void BFSSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) {
     while (!node_stack.empty()) {
         current = node_stack.front();
         node_stack.pop();
+        callback(Event::Current, current);
         for (auto &pair: graph.adj_of(current)) {
             graph::Vertex *next = graph.get_vertices()[pair.first];
-
-            if ((next->type != graph::Type::start) && (next->type != graph::Type::end) &&
-                (next->type != graph::Type::occupied)) {
-                next->color = sf::Color::White;
-                next->type = graph::Type::being_processed;
-            }
-            std::this_thread::sleep_for(std::chrono::microseconds(100));
-
             if (!next->pred) {
+                callback(Event::Relax, next);
                 next->pred = current;
                 node_stack.push(next);
             }

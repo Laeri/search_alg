@@ -15,6 +15,7 @@ void GBestFirstSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &g
     while (!open.empty()) {
         // no edges are relaxed, therefore open.top() always returns smallest element
         current = open.top();
+        callback(Event::Current, current);
         open.pop();
         if (current == &goal) {
             break;
@@ -27,13 +28,9 @@ void GBestFirstSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &g
                     float distance = std::sqrt(dPos.x * dPos.x + dPos.y * dPos.y);
                     node->distance = distance;
                     open.push(node);
+                    callback(Event::Relax, node);
                 }
-                if ((node->type != graph::Type::start) && (node->type != graph::Type::end) &&
-                    (node->type != graph::Type::occupied)) {
-                    node->color = sf::Color::White;
-                    node->type = graph::Type::being_processed;
-                }
-                std::this_thread::sleep_for(std::chrono::milliseconds(2));
+              //  std::this_thread::sleep_for(std::chrono::milliseconds(2));
             }
         }
     }

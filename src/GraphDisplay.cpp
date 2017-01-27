@@ -74,8 +74,8 @@ void GraphDisplay::run() {
     search_func["Bellman-Ford"] = new BellmanFordSearch();
     search_func["A-Star"] = new AStarSearch();
     search_func["Greedy Best-First-Search"] = new GBestFirstSearch();
-    auto current_search = search_func.begin();
 
+    auto current_search = search_func.begin();
     sf::CircleShape circle(1);
     circle.setFillColor(sf::Color::Black);
     circle.setOrigin(circle.getGlobalBounds().width / 2, circle.getGlobalBounds().height / 2);

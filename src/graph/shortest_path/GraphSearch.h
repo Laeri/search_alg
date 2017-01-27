@@ -8,12 +8,28 @@
 
 #include "../Graph.h"
 
+
+enum class Event {
+    Current, Relax
+};
+typedef std::function<void(Event, graph::Vertex *)> Function;
+
 class GraphSearch {
+private:
+    Function on_event = nullptr;
+    int relax_steps = 0;
 public:
+
+    GraphSearch();
+    GraphSearch(Function on_event);
+
     virtual void search(Graph &graph, graph::Vertex &src, graph::Vertex &goal)= 0;
+
     virtual void relax(graph::Vertex &u, graph::Vertex &v, float weight);
 
     virtual void init_single_src(Graph &graph, graph::Vertex &src);
+
+    virtual void callback(Event event, graph::Vertex *vertex);
 };
 
 

@@ -14,15 +14,13 @@ void DFSSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) {
     while (!v_stack.empty()) {
         graph::Vertex *current = v_stack.top();
         v_stack.pop();
+        callback(Event::Current, current);
         std::vector<std::pair<int, float>> tmp = std::vector<std::pair<int, float>>(*(&graph.adj_of(current)));
         while (!tmp.empty()) {
             int i = std::rand() % tmp.size();
             graph::Vertex *branch = graph.get_vertices()[tmp[i].first];
-            if (branch->type != graph::Type::start && branch->type != graph::Type::end) {
-                branch->type = graph::Type::being_processed;
-                branch->color = sf::Color::White;
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            callback(Event::Relax, branch);
+            //std::this_thread::sleep_for(std::chrono::milliseconds(1));
             if (!branch->pred) {
                 v_stack.push(branch);
                 branch->pred = current;

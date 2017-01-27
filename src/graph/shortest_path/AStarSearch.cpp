@@ -4,6 +4,7 @@
 
 #include <map>
 #include <thread>
+#include <mutex>
 #include "AStarSearch.h"
 
 void AStarSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) {
@@ -36,9 +37,11 @@ void AStarSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) 
         open.erase(open.begin() + min_pos);
         closed.push_back(current);
 
+        callback(Event::Current, current);
         if (current == &goal) {
             break;
         }
+
 
         for (auto &pair: graph.adj_of(current)) {
             graph::Vertex *node = graph.get_vertices()[pair.first];
@@ -56,6 +59,7 @@ void AStarSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) 
                     g_cost[node] = g;
                     h_cost[node] = h;
                     f_cost[node] = f;
+                    callback(Event::Relax, node);
                 } else { // check if g cost is lower than g cost present, if so update cost and parent if child node
                     if(g < g_cost[node]){
                         node->pred = current;
@@ -63,17 +67,10 @@ void AStarSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) 
                         g_cost[node] = g;
                         h_cost[node] = h;
                         f_cost[node] = f;
+                        callback(Event::Relax, node);
                     }
                 }
 
-
-
-                // color
-                if((current->type != graph::Type::start) && (current->type != graph::Type::end) && (current->type != graph::Type::occupied)) {
-                    current->color = sf::Color::White;
-                    current->type = graph::Type::being_processed;
-                }
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
             }
         }
