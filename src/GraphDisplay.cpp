@@ -21,6 +21,7 @@
 #include "graph/shortest_path/AStarSearch.h"
 #include "graph/shortest_path/GBestFirstSearch.h"
 #include "graph/shortest_path/heuristic/EuclideanDistance.h"
+#include "graph/shortest_path/heuristic/ManhattenDistance.h"
 
 
 GraphDisplay::GraphDisplay() {}
@@ -238,7 +239,7 @@ void GraphDisplay::createSearches() {
     search_func["DFS"] = new DFSSearch();
     search_func["BFS"] = new BFSSearch();
     search_func["Bellman-Ford"] = new BellmanFordSearch();
-    search_func["A-Star"] = new AStarSearch(new EuclideanDistance());
+    search_func["A-Star"] = new AStarSearch(new ManhattenDistance());
     search_func["Greedy Best-First-Search"] = new GBestFirstSearch();
     current_search = search_func.begin();
 }
