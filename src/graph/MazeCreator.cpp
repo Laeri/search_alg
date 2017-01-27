@@ -5,6 +5,7 @@
 #include <stack>
 #include <set>
 #include <iostream>
+#include <thread>
 #include "MazeCreator.h"
 
 bool MazeCreator::is_pos_acceptable(Grid &grid, Graph &graph, sf::Vector2i new_pos, sf::Vector2i parent_pos,
@@ -71,6 +72,10 @@ sf::Vector2i MazeCreator::next(sf::Vector2i current, Dir dir) {
 }
 
 void MazeCreator::createMaze(Grid &grid, Graph &graph, int x_start, int y_start, int step_size) {
+    createMaze(grid, graph, x_start, y_start, step_size, step_size);
+}
+
+void MazeCreator::createMaze(Grid &grid, Graph &graph, int x_start, int y_start, int step_size, int min_path_size) {
     graph::Vertex *start = grid[x_start][y_start];
     start->type = graph::Type::maze_field;
     std::stack<sf::Vector2i> pos_stack;
@@ -95,22 +100,33 @@ void MazeCreator::createMaze(Grid &grid, Graph &graph, int x_start, int y_start,
 
             sf::Vector2i tmp = current_pos;
             bool path_found = true;
+            int path_length = 0;
+
             for (int i = 0; i < step_size; i++) {
                 sf::Vector2i parent_pos = sf::Vector2i(tmp);
                 tmp = next(tmp, dir);
-                if (!is_pos_acceptable(grid, graph, tmp, parent_pos, start, dir)) path_found = false;
+                if (!is_pos_acceptable(grid, graph, tmp, parent_pos, start, dir)) {
+                    path_found = false;
+                    break;
+                }
+                path_length ++;
             }
 
 
             tmp = current_pos;
             graph::Vertex *child;
-            if (path_found) {
-                for (int i = 0; i < step_size; i++) {
+            graph::Vertex *previous;
+            previous = current_node;
+            if (path_found || path_length >= min_path_size) {
+                for (int i = 0; i < path_length; i++) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
                     tmp = next(tmp, dir);
                     child = grid[tmp.x][tmp.y];
-                    child->pred = current_node;
-                    graph.bi_connect(child, current_node, 1);
+                    child->pred = previous;
+                    graph.bi_connect(child, previous, 1);
                     grid[tmp.x][tmp.y]->type = graph::Type::maze_field;
+                    previous = child;
                 }
                 pos_stack.push(tmp);
             }
@@ -134,6 +150,9 @@ void MazeCreator::createMaze(Grid &grid, Graph &graph, int x_start, int y_start,
         if (v->type != graph::Type::maze_field) {
             v->color = sf::Color::Blue;
             v->type = graph::Type::occupied;
+        } else {
+            v->pred = nullptr;
+            v->type = graph::Type ::free;
         }
     }
 }

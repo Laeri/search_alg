@@ -42,14 +42,19 @@ void color(graph::Vertex *end, sf::Color &on_path) {
 
 void run_and_color(Grid &grid, Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path) {
     //bellman_ford::bellman_ford(graph, *start);
-    // Dijkstra::dijkstra(graph, *start);
+    Dijkstra::dijkstra(graph, *start);
     // dfs::dfs_search(graph, *start);
     // dfs::dfs_it(graph, *start);
     // dfs::dfs_maze(grid, graph, *start);
-  //   best_first::best_first_search(graph, *start, *end);
+    //   best_first::best_first_search(graph, *start, *end);
     //bfs::bfs_search(graph, *start);
-    a_star::a_star_search(graph, *start, *end);
+    // a_star::a_star_search(graph, *start, *end);
     color(end, on_path);
+}
+
+void create_maze(Grid &grid, Graph &graph, int start_x, int start_y, int step_size) {
+    MazeCreator mazeCreator;
+    mazeCreator.createMaze(grid, graph, start_x, start_y, step_size);
 }
 
 void GraphDisplay::run() {
@@ -77,11 +82,12 @@ void GraphDisplay::run() {
     int grid_height = SCREEN_HEIGHT / side_length;
     rectangleShape.setSize({side_length, side_length});
     Grid grid = Grid(grid_width, std::vector<graph::Vertex *>(grid_height));
-    MazeCreator mazeCreator;
 
     init_grid_graph(grid, free_color, side_length, grid_width, grid_height);
     Graph &g = *graph;
-    mazeCreator.createMaze(grid, *graph,0,0, 2);
+
+    std::thread maze_thread(create_maze, std::ref(grid), std::ref(*graph), 0,0,2);
+    maze_thread.detach();
     //connect_grid(grid_width, grid_height, grid);
 
 
