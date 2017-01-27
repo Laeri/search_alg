@@ -57,7 +57,7 @@ public:
 
     void draw_connections(sf::RenderWindow &window, sf::Vertex *line, float half_length) const;
 
-    void connect_grid(int grid_width, int grid_height, const Grid &grid) const;
+    void connect_grid(int grid_width, int grid_height, const Grid &grid, const float grid_length) const;
 
     bool inside_grid(int side_length, const Grid &grid, int &x, int &y) const;
 

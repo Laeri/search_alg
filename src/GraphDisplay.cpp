@@ -59,7 +59,7 @@ void GraphDisplay::run() {
     // create grid and add vertices to graph (without connections)
     init_grid_graph(grid, colors[graph::Type::free], side_length, grid_width, grid_height);
     // connect all vertices with neighbour vertices on grid
-    connect_grid(grid_width, grid_height, grid);
+    connect_grid(grid_width, grid_height, grid, side_length);
 
     // start and end position used for searching
     graph::Vertex *start = nullptr;
@@ -89,7 +89,7 @@ void GraphDisplay::run() {
                             for (auto &adj: graph->get_adjacencies()) {
                                 adj.clear();
                             }
-                            connect_grid(grid_width, grid_height, grid);
+                            connect_grid(grid_width, grid_height, grid, side_length);
                             break;
                             // reset map/graph but keep obstacles
                         case sf::Keyboard::T:
@@ -249,14 +249,14 @@ bool GraphDisplay::inside_grid(int side_length, const Grid &grid, int &x, int &y
     return x >= 0 && y >= 0 && x < grid.size() && y < grid[0].size();
 }
 
-void GraphDisplay::connect_grid(int grid_width, int grid_height, const Grid &grid) const {
+void GraphDisplay::connect_grid(int grid_width, int grid_height, const Grid &grid, const float grid_length) const {
     for (auto i = 0; i < grid_width; i++) {
         for (auto j = 0; j < grid_height; j++) {
             for (auto &pair: neighbours) {
                 int coord_x = clamp(i + pair.first, 0, grid_width - 1);
                 int coord_y = clamp(j + pair.second, 0, grid_height - 1);
                 if (!(i == coord_x && j == coord_y)) {
-                    sf::Vector2f dPos = sf::Vector2f(i - coord_x, j - coord_y);
+                    sf::Vector2f dPos = sf::Vector2f((i - coord_x)*grid_length, (j - coord_y)*grid_length);
                     float dist = std::sqrt(dPos.x * dPos.x + dPos.y * dPos.y);
                     graph->bi_connect(grid[i][j], grid[coord_x][coord_y], dist);
                 }
