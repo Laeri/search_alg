@@ -53,6 +53,7 @@ void create_maze(Grid &grid, Graph &graph, int start_x, int start_y, int step_si
 }
 
 void GraphDisplay::run() {
+    std::mutex mutex;
     sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Search Algorithms");
     GridDrawer gridDrawer;
 
@@ -106,6 +107,11 @@ void GraphDisplay::run() {
     graph::Vertex *start = nullptr;
     graph::Vertex *end = nullptr;
 
+    bool *lock_step = new bool();
+    *lock_step = false;
+    for (auto &search: search_func) {
+        search.second->lock_step = lock_step;
+    }
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -147,6 +153,17 @@ void GraphDisplay::run() {
                     } else if (event.key.code == sf::Keyboard::Left) {
                         if (current_search == search_func.begin()) current_search = search_func.end();
                         current_search--;
+                    } else if (event.key.code == sf::Keyboard::L) {
+                        current_search->second->locked = true;
+                    } else if (event.key.code == sf::Keyboard::U) {
+                        current_search->second->locked = false;
+                        current_search->second->var.notify_one();
+                    } else if (event.key.code == sf::Keyboard::P) {
+                        *lock_step = *lock_step ? false : true;
+                        if (!*lock_step) {
+                            current_search->second->locked = false;
+                            current_search->second->var.notify_one();
+                        }
                     }
                     break;
                 case sf::Event::KeyReleased:

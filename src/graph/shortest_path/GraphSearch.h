@@ -6,6 +6,8 @@
 #define SEARCH_ALG_GRAPHSEARCH_H
 
 
+#include <mutex>
+#include <condition_variable>
 #include "../Graph.h"
 
 
@@ -18,10 +20,18 @@ class GraphSearch {
 private:
     Function on_event = nullptr;
     int relax_steps = 0;
+
 public:
 
     GraphSearch();
+
     GraphSearch(Function on_event);
+
+    std::mutex mutex;
+    std::condition_variable var;
+    std::unique_lock<std::mutex> lock;
+    bool locked = false;
+    bool *lock_step = nullptr;
 
     virtual void search(Graph &graph, graph::Vertex &src, graph::Vertex &goal)= 0;
 
