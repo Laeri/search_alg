@@ -20,6 +20,7 @@ class GraphDisplay {
 private:
     int SCREEN_HEIGHT = 640;
     int SCREEN_WIDTH = 640;
+    sf::Font font;
     sf::Text text;
     Search_it current_search;
     std::map<std::string, GraphSearch *> search_func;
@@ -37,7 +38,7 @@ private:
                                                    {0,  -1}};
 public:
     GraphDisplay();
-
+    ~GraphDisplay();
     void run();
 
     void close();
@@ -63,7 +64,14 @@ public:
     void createSearches();
 
     void drawText();
+
+    void createMaze(const sf::Color &free_color, Grid &grid, graph::Vertex *&start, graph::Vertex *&end);
+
+    void createText();
 };
 
-
+void color(graph::Vertex *end, sf::Color &on_path);
+void run_search(GraphSearch *search, Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path);
+int clamp(int x, int min, int max);
+void create_maze(Grid &grid, Graph &graph, int start_x, int start_y, int step_size);
 #endif //SEARCH_ALG_GRAPHDISPLAY_H

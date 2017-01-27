@@ -10,8 +10,6 @@
 #include <thread>
 #include <iostream>
 #include "GraphDisplay.h"
-#include "graph/Graph.h"
-#include "Command.h"
 #include "DeleteConnectionAction.h"
 #include "GridDrawer.h"
 #include "graph/MazeCreator.h"
@@ -27,73 +25,38 @@
 GraphDisplay::GraphDisplay() {}
 
 
-int clamp(int x, int min, int max) {
-    return std::min(std::max(x, min), max);
-}
-
-void color(graph::Vertex *end, sf::Color &on_path) {
-    graph::Vertex *current = end;
-    while ((current = current->pred)) {
-
-        if (current->type != graph::Type::start && current->type != graph::Type::end) {
-            current->type = graph::Type::on_path;
-            current->color = on_path;
-        }
-    }
-}
-
-void run_search(GraphSearch *search, Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path) {
-    search->search(graph, *start, *end);
-    color(end, on_path);
-}
-
-void create_maze(Grid &grid, Graph &graph, int start_x, int start_y, int step_size) {
-    MazeCreator mazeCreator;
-    mazeCreator.createMaze(grid, graph, start_x, start_y, step_size);
-}
-
 void GraphDisplay::run() {
 
     sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Search Algorithms");
-    GridDrawer gridDrawer;
 
     graph = std::make_shared<Graph>();
 
-    sf::Font font;
-    if (!font.loadFromFile("Rubik-Regular.ttf")) {
-        std::cout << "Font could not be found" << std::endl;
-    }
-    text.setFont(font);
-    text.setCharacterSize(24);
-    text.setColor(sf::Color::Black);
-    createSearches();
-
-    // shapes to draw grid and graph
-    sf::CircleShape circle(1);
-    circle.setFillColor(sf::Color::Black);
-    circle.setOrigin(circle.getGlobalBounds().width / 2, circle.getGlobalBounds().height / 2);
-    sf::RectangleShape rectangleShape({2, 2});
-    rectangleShape.setOutlineThickness(1);
-    rectangleShape.setOutlineColor(sf::Color::Black);
-
     // colors to color nodes
-    sf::Color free_color = sf::Color(100, 255, 100);
-    sf::Color taken_color = sf::Color(100, 100, 255);
-    sf::Color start_color = sf::Color(255, 0, 0);
-    sf::Color end_color = sf::Color(255, 0, 100);
-    sf::Color on_path = sf::Color(79, 26, 60);
+    std::map<graph::Type, sf::Color> colors = {
+            {graph::Type::free,            sf::Color(100, 255, 100)},
+            {graph::Type::being_processed, sf::Color::White},
+            {graph::Type::start,           sf::Color(255, 0, 0)},
+            {graph::Type::end,             sf::Color(255, 0, 100)},
+            {graph::Type::on_path,         sf::Color(79, 26, 60)},
+            {graph::Type::occupied,        sf::Color(100, 100, 255)},
+            {graph::Type::relaxed,         sf::Color::Magenta}
+    };
 
     // create grid
     int side_length = 16; // in pixels
     float half_length = side_length / 2.f;
     int grid_width = SCREEN_WIDTH / side_length;
     int grid_height = SCREEN_HEIGHT / side_length;
-    rectangleShape.setSize({side_length, side_length});
+
+    GridDrawer gridDrawer(colors, side_length);
+
+    createText();
+
+    createSearches();
+
     Grid grid = Grid(grid_width, std::vector<graph::Vertex *>(grid_height));
-
     // create grid and add vertices to graph (without connections)
-    init_grid_graph(grid, free_color, side_length, grid_width, grid_height);
-
+    init_grid_graph(grid, colors[graph::Type::free], side_length, grid_width, grid_height);
     // connect all vertices with neighbour vertices on grid
     connect_grid(grid_width, grid_height, grid);
 
@@ -118,7 +81,7 @@ void GraphDisplay::run() {
                     if (event.key.code == sf::Keyboard::Escape) {
                         window.close();
                     } else if (event.key.code == sf::Keyboard::R) { // reset map, clear connections
-                        reset(free_color, *graph, start, end);
+                        reset(colors[graph::Type::free], *graph, start, end);
                         for (auto &adj: graph->get_adjacencies()) {
                             adj.clear();
                         }
@@ -127,21 +90,14 @@ void GraphDisplay::run() {
                         for (auto &v :graph->get_vertices()) {
                             if (v->type != graph::Type::occupied) {
                                 v->pred = nullptr;
-                                v->color = free_color;
+                                v->color = colors[graph::Type::free];
                                 v->type = graph::Type::free;
                             }
                         }
                         start = nullptr;
                         end = nullptr;
                     } else if (event.key.code == sf::Keyboard::M) { // create a maze with dfs on sepearate thread
-                        reset(free_color, *graph, start, end);
-                        sf::Clock clock;
-                        srand(time((time_t *) clock.getElapsedTime().asMilliseconds()));
-                        for (auto &adj: graph->get_adjacencies()) {
-                            adj.clear();
-                        }
-                        std::thread maze_thread(create_maze, std::ref(grid), std::ref(*graph), 0, 0, 2);
-                        maze_thread.detach();
+                        createMaze(colors[graph::Type::free], grid, start, end);
                     } else if (event.key.code == sf::Keyboard::Right) { // cycle through search algorithms
                         current_search++;
                         if (current_search == search_func.end()) current_search = search_func.begin();
@@ -173,35 +129,36 @@ void GraphDisplay::run() {
                         int y = event.mouseButton.y * (1.f / side_length);
                         if (!start) { // if start not set, set it at mouse pos
                             start = grid[x][y];
-                            start->color = start_color;
+                            start->color = colors[graph::Type::start];
                             start->type = graph::Type::start;
                         } else if (!end) { // if start set but end not, set it at mouse pos
                             end = grid[x][y];
                             end->type = graph::Type::end;
-                            end->color = end_color;
+                            end->color = colors[graph::Type::end];
                             std::thread t1(run_search, current_search->second, std::ref(*graph), start, end,
-                                           std::ref(on_path));
+                                           std::ref(colors[graph::Type::on_path]));
                             t1.detach();
                         } else { // if start and end have been set and CTRL is still down, choose new end node and color shortest path again
                             end->type = graph::Type::free;
-                            end->color = free_color;
+                            end->color = colors[graph::Type::free];
                             graph::Vertex *path_v = end;
+                            // remove color of old path
                             while ((path_v = path_v->pred)) {
                                 if (path_v->type == graph::Type::start) break;
                                 path_v->type = graph::Type::free;
-                                path_v->color = free_color;
+                                path_v->color = colors[graph::Type::free];
                             }
 
                             end = grid[x][y];
                             end->type = graph::Type::end;
-                            end->color = end_color;
-                            color(end, on_path);
+                            end->color = colors[graph::Type::end];
+                            color(end, colors[graph::Type::on_path]);
                         }
                     } else { // if CTRL is not down, create an obstacle and remove connections in graph
                         int x = event.mouseButton.x;
                         int y = event.mouseButton.y;
                         if (inside_grid(side_length, grid, x, y)) {
-                            grid[x][y]->color = taken_color;
+                            grid[x][y]->color = colors[graph::Type::occupied];
                             Command *delete_action = new DeleteConnectionAction(*graph,
                                                                                 sf::Vector2i(x, y),
                                                                                 grid[x][y]);
@@ -222,7 +179,7 @@ void GraphDisplay::run() {
                         int x = event.mouseMove.x;
                         int y = event.mouseMove.y;
                         if (inside_grid(side_length, grid, x, y)) {
-                            grid[x][y]->color = taken_color;
+                            grid[x][y]->color = colors[graph::Type::occupied];
                             Command *delete_action = new DeleteConnectionAction(*graph, sf::Vector2i(x, y), grid[x][y]);
                             delete_action->do_action();
                             commands.push_back(delete_action);
@@ -232,12 +189,31 @@ void GraphDisplay::run() {
             }
         }
         window.clear();
-        gridDrawer.draw(*graph, window, grid, circle, rectangleShape, half_length);
+        gridDrawer.draw(*graph, window, grid, half_length);
         drawText();
         window.draw(text);
-
         window.display();
     }
+}
+
+void GraphDisplay::createText() {
+    if (!font.loadFromFile("Rubik-Regular.ttf")) {
+        std::cout << "Font could not be found" << std::endl;
+    }
+    text.setFont(font);
+    text.setCharacterSize(24);
+    text.setColor(sf::Color::Black);
+}
+
+void GraphDisplay::createMaze(const sf::Color &free_color, Grid &grid, graph::Vertex *&start, graph::Vertex *&end) {
+    reset(free_color, *graph, start, end);
+    sf::Clock clock;
+    srand(time((time_t *) clock.getElapsedTime().asMilliseconds()));
+    for (auto &adj: graph->get_adjacencies()) {
+        adj.clear();
+    }
+    std::thread maze_thread(create_maze, ref(grid), std::ref(*graph), 0, 0, 2);
+    maze_thread.detach();
 }
 
 void GraphDisplay::drawText() {
@@ -309,7 +285,32 @@ void GraphDisplay::reset(const sf::Color &free_color, Graph &graph, graph::Verte
     commands.clear();
 }
 
+GraphDisplay::~GraphDisplay() {
+    delete lock_step;
+}
 
-void GraphDisplay::close() {
 
+int clamp(int x, int min, int max) {
+    return std::min(std::max(x, min), max);
+}
+
+void color(graph::Vertex *end, sf::Color &on_path) {
+    graph::Vertex *current = end;
+    while ((current = current->pred)) {
+
+        if (current->type != graph::Type::start && current->type != graph::Type::end) {
+            current->type = graph::Type::on_path;
+            current->color = on_path;
+        }
+    }
+}
+
+void run_search(GraphSearch *search, Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path) {
+    search->search(graph, *start, *end);
+    color(end, on_path);
+}
+
+void create_maze(Grid &grid, Graph &graph, int start_x, int start_y, int step_size) {
+    MazeCreator mazeCreator;
+    mazeCreator.createMaze(grid, graph, start_x, start_y, step_size);
 }

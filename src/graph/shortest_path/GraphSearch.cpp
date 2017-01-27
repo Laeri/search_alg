@@ -12,7 +12,9 @@ GraphSearch::GraphSearch() {
             case Event::Relax:
                 this->relax_steps++;
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                node->color = sf::Color::Magenta;
+                if (node->type != graph::Type::start && node->type != graph::Type::end) {
+                    node->type = graph::Type::relaxed;
+                }
                 break;
             case Event::Current:
                 if ((node->type != graph::Type::start) && (node->type != graph::Type::end) &&
@@ -52,7 +54,7 @@ void GraphSearch::relax(graph::Vertex &u, graph::Vertex &v, float weight) {
 void GraphSearch::callback(Event event, graph::Vertex *vertex) {
     if (locked) {
         var.wait(lock);
-    } else if(lock_step && *lock_step) locked = true;
+    } else if (lock_step && *lock_step) locked = true;
     if (on_event) on_event(event, vertex);
     else std::cout << "No callback function provided!" << std::endl;
 }

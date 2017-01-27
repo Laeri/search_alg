@@ -8,7 +8,7 @@
 
 namespace graph {
     enum class Type {
-        start, end, free, being_processed, on_path, occupied, maze_field
+        start, end, free, being_processed, on_path, occupied, maze_field, relaxed
     };
 }
 #endif //SEARCH_ALG_TYPE_H
