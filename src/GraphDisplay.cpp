@@ -13,12 +13,14 @@
 #include "Command.h"
 #include "DeleteConnectionAction.h"
 #include "GridDrawer.h"
-#include "graph/shortest_path/GreedyBestFirstSearch.h"
 #include "graph/MazeCreator.h"
 #include "graph/shortest_path/GraphSearch.h"
 #include "graph/shortest_path/DijkstraSearch.h"
 #include "graph/shortest_path/DFSSearch.h"
 #include "graph/shortest_path/BFSSearch.h"
+#include "graph/shortest_path/BellmanFordSearch.h"
+#include "graph/shortest_path/AStarSearch.h"
+#include "graph/shortest_path/GBestFirstSearch.h"
 
 
 GraphDisplay::GraphDisplay() {}
@@ -71,7 +73,11 @@ void GraphDisplay::run() {
     search_func["Dijkstra"] = new DijkstraSearch();
     search_func["DFS"] = new DFSSearch();
     search_func["BFS"] = new BFSSearch();
+    search_func["Bellman-Ford"] = new BellmanFordSearch();
+    search_func["A-Star"] = new AStarSearch();
+    search_func["Greedy Best-First-Search"] = new GBestFirstSearch();
     auto current_search = search_func.begin();
+
     sf::CircleShape circle(1);
     circle.setFillColor(sf::Color::Black);
     circle.setOrigin(circle.getGlobalBounds().width / 2, circle.getGlobalBounds().height / 2);
