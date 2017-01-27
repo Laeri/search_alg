@@ -42,13 +42,13 @@ void color(graph::Vertex *end, sf::Color &on_path) {
 
 void run_and_color(Grid &grid, Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path) {
     //bellman_ford::bellman_ford(graph, *start);
-    Dijkstra::dijkstra(graph, *start);
+    // Dijkstra::dijkstra(graph, *start);
     // dfs::dfs_search(graph, *start);
     // dfs::dfs_it(graph, *start);
     // dfs::dfs_maze(grid, graph, *start);
     //   best_first::best_first_search(graph, *start, *end);
     //bfs::bfs_search(graph, *start);
-    // a_star::a_star_search(graph, *start, *end);
+    a_star::a_star_search(graph, *start, *end);
     color(end, on_path);
 }
 
@@ -105,18 +105,28 @@ void GraphDisplay::run() {
                         window.close();
                     } else if (event.key.code == sf::Keyboard::R) {
                         reset(free_color, *graph, start, end);
-                        for(auto &adj: graph->get_adjacencies()){
+                        for (auto &adj: graph->get_adjacencies()) {
                             adj.clear();
                         }
-                        connect_grid(grid_width,grid_height, grid);
-                    } else if(event.key.code == sf::Keyboard::M){
+                        connect_grid(grid_width, grid_height, grid);
+                    } else if (event.key.code == sf::Keyboard::T) {
+                        for (auto &v :graph->get_vertices()) {
+                            if (v->type != graph::Type::occupied) {
+                                v->pred = nullptr;
+                                v->color = free_color;
+                                v->type = graph::Type::free;
+                            }
+                        }
+                        start = nullptr;
+                        end = nullptr;
+                    } else if (event.key.code == sf::Keyboard::M) {
                         reset(free_color, *graph, start, end);
                         sf::Clock clock;
                         srand(time((time_t *) clock.getElapsedTime().asMilliseconds()));
-                        for(auto &adj: graph->get_adjacencies()){
+                        for (auto &adj: graph->get_adjacencies()) {
                             adj.clear();
                         }
-                        std::thread maze_thread(create_maze, std::ref(grid), std::ref(*graph), 0,0,2);
+                        std::thread maze_thread(create_maze, std::ref(grid), std::ref(*graph), 0, 0, 2);
                         maze_thread.detach();
                     }
                     break;
