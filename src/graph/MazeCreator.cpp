@@ -92,8 +92,6 @@ void MazeCreator::createMaze(Grid &grid, Graph &graph, int x_start, int y_start,
 
         for (auto &dir: directions) {
             sf::Vector2i child_pos = next(current_pos, dir);
-
-
             if (child_pos.x < 0 || child_pos.x >= grid.size() || child_pos.y < 0 ||
                 child_pos.y >= grid.size())
                 continue;
@@ -111,8 +109,6 @@ void MazeCreator::createMaze(Grid &grid, Graph &graph, int x_start, int y_start,
                 }
                 path_length ++;
             }
-
-
             tmp = current_pos;
             graph::Vertex *child;
             graph::Vertex *previous;
@@ -130,20 +126,7 @@ void MazeCreator::createMaze(Grid &grid, Graph &graph, int x_start, int y_start,
                 }
                 pos_stack.push(tmp);
             }
-
-            /* graph::Vertex *child_node = grid[child_pos.x][child_pos.y];
-             child_node->pred = current_node;
-             if (is_pos_acceptable(grid, graph, child_pos, dir)) {
-                 pos_stack.push(child_pos);
-                 grid[child_pos.x][child_pos.y]->type = graph::Type::maze_field;
-                 graph.bi_connect(child_node, current_node, 1);
-             } else {
-                 child_node->pred = nullptr;
-             }*/
-
-
         }
-
     }
 
     for (auto &v: graph.get_vertices()) {

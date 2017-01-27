@@ -152,16 +152,17 @@ void GraphDisplay::run() {
                             std::thread t1(run_search, current_search->second, std::ref(*graph), start, end);
                             t1.detach();
                         } else { // if start and end have been set and CTRL is still down, choose new end node and color shortest path again
-                            end->type = graph::Type::free;
+                            end->type = graph::Type::being_processed;
                             graph::Vertex *path_v = end;
                             // remove old path / set its type to Type::free
                             while ((path_v = path_v->pred)) {
                                 if (path_v->type == graph::Type::start) break;
-                                path_v->type = graph::Type::free;
+                                path_v->type = graph::Type::being_processed;
                             }
 
                             end = grid[x][y];
                             end->type = graph::Type::end;
+                            color(end);
                         }
                     } else { // if CTRL is not down, create an obstacle and remove connections in graph
                         int x = event.mouseButton.x;
@@ -195,7 +196,7 @@ void GraphDisplay::run() {
     }
 }
 
-GraphDisplay::deleteConnections(const Grid &grid, int x, int y) {
+void GraphDisplay::deleteConnections(const Grid &grid, int x, int y) {
     grid[x][y]->type = graph::Type::occupied;
     Command *delete_action = new DeleteConnectionAction(*graph,
                                                         sf::Vector2i(x, y),
