@@ -10,7 +10,7 @@
 
 class BFSSearch: public GraphSearch {
 public:
-    void search(Graph &graph, graph::Vertex &src) override;
+    void search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) override;
 };
 
 

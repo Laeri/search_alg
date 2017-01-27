@@ -7,7 +7,7 @@
 #include <thread>
 #include "DFSSearch.h"
 
-void DFSSearch::search(Graph &graph, graph::Vertex &src) {
+void DFSSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) {
     std::stack<graph::Vertex *> v_stack;
     v_stack.push(&src);
     src.pred = &src; // create dummy connection

@@ -1,13 +1,13 @@
 //
-// Created by laeri on 1/26/17.
+// Created by laeri on 1/27/17.
 //
+
 #include <map>
 #include <thread>
-#include "AStar.h"
-#include "Dijkstra.h"
+#include "AStarSearch.h"
 
-void a_star::a_star_search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) {
-    Dijkstra::init_single_source(graph, src);
+void AStarSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) {
+    init_single_src(graph, src);
     std::vector<graph::Vertex *> open;
     std::vector<graph::Vertex *> closed;
 

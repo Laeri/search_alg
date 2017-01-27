@@ -11,14 +11,9 @@
 #include "GraphDisplay.h"
 #include "graph/Graph.h"
 #include "Command.h"
-#include "graph/shortest_path/Dijkstra.h"
 #include "DeleteConnectionAction.h"
-#include "graph/shortest_path/BellmanFord.h"
 #include "GridDrawer.h"
-#include "graph/shortest_path/DFS.h"
 #include "graph/shortest_path/GreedyBestFirstSearch.h"
-#include "graph/shortest_path/BFS.h"
-#include "graph/shortest_path/AStar.h"
 #include "graph/MazeCreator.h"
 #include "graph/shortest_path/GraphSearch.h"
 #include "graph/shortest_path/DijkstraSearch.h"
@@ -52,12 +47,12 @@ void run_and_color(Grid &grid, Graph &graph, graph::Vertex *start, graph::Vertex
     // dfs::dfs_maze(grid, graph, *start);
     //   best_first::best_first_search(graph, *start, *end);
     //bfs::bfs_search(graph, *start);
-    a_star::a_star_search(graph, *start, *end);
+    // a_star::a_star_search(graph, *start, *end);
     color(end, on_path);
 }
 
 void run_search(GraphSearch *search, Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path) {
-    search->search(graph, *start);
+    search->search(graph, *start, *end);
     color(end, on_path);
 }
 
@@ -70,7 +65,7 @@ void GraphDisplay::run() {
     sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Search Algorithms");
     GridDrawer gridDrawer;
 
-    std::map<std::string, GraphSearch*> search_func;
+    std::map<std::string, GraphSearch *> search_func;
 
 
     search_func["Dijkstra"] = new DijkstraSearch();

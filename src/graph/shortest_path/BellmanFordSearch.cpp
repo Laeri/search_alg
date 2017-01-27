@@ -1,15 +1,12 @@
 //
-// Created by laeri on 1/24/17.
+// Created by laeri on 1/27/17.
 //
 
-#include <chrono>
 #include <thread>
-#include <iostream>
-#include "BellmanFord.h"
-#include "Dijkstra.h"
+#include "BellmanFordSearch.h"
 
-void bellman_ford::bellman_ford(Graph &graph, graph::Vertex &src) {
-    Dijkstra::init_single_source(graph, src);
+void BellmanFordSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) {
+    init_single_src(graph, src);
 
     Adjacency &adj = graph.get_adjacencies();
     for(int i = 0; i < graph.get_vertices().size()-1; i++){
@@ -25,7 +22,7 @@ void bellman_ford::bellman_ford(Graph &graph, graph::Vertex &src) {
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 }
-                Dijkstra::relax(u,v,pair.second);
+                relax(*u,*v,pair.second);
             }
             v1++;
         }
@@ -42,5 +39,4 @@ void bellman_ford::bellman_ford(Graph &graph, graph::Vertex &src) {
         }
         v1++;
     }
-
 }

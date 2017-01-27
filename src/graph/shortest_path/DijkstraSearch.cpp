@@ -5,7 +5,7 @@
 #include <thread>
 #include "DijkstraSearch.h"
 
-void DijkstraSearch::search(Graph &graph, graph::Vertex &src) {
+void DijkstraSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) {
     init_single_src(graph, src);
     std::vector<graph::Vertex *> S;
     std::vector<graph::Vertex *> Q;

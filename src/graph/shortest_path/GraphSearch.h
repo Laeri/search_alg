@@ -10,7 +10,7 @@
 
 class GraphSearch {
 public:
-    virtual void search(Graph &graph, graph::Vertex &src)= 0;
+    virtual void search(Graph &graph, graph::Vertex &src, graph::Vertex &goal)= 0;
     virtual void relax(graph::Vertex &u, graph::Vertex &v, float weight);
 
     virtual void init_single_src(Graph &graph, graph::Vertex &src);

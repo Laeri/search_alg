@@ -6,7 +6,6 @@
 #include <thread>
 #include <iostream>
 #include "GreedyBestFirstSearch.h"
-#include "Dijkstra.h"
 
 void best_first::best_first_search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) {
     std::priority_queue<graph::Vertex *, std::vector<graph::Vertex *>, compare> open;

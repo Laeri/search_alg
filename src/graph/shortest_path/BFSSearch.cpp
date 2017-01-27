@@ -6,7 +6,7 @@
 #include <queue>
 #include "BFSSearch.h"
 
-void BFSSearch::search(Graph &graph, graph::Vertex &src) {
+void BFSSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) {
     src.pred = &src;
     std::queue<graph::Vertex *> node_stack;
     node_stack.push(&src);
