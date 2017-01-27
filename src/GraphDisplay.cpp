@@ -53,30 +53,22 @@ void create_maze(Grid &grid, Graph &graph, int start_x, int start_y, int step_si
 }
 
 void GraphDisplay::run() {
-    std::mutex mutex;
+
     sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Search Algorithms");
     GridDrawer gridDrawer;
 
-    std::map<std::string, GraphSearch *> search_func;
-
+    graph = std::make_shared<Graph>();
 
     sf::Font font;
     if (!font.loadFromFile("Rubik-Regular.ttf")) {
         std::cout << "Font could not be found" << std::endl;
     }
-    sf::Text text;
     text.setFont(font);
     text.setCharacterSize(24);
     text.setColor(sf::Color::Black);
+    createSearches();
 
-    search_func["Dijkstra"] = new DijkstraSearch();
-    search_func["DFS"] = new DFSSearch();
-    search_func["BFS"] = new BFSSearch();
-    search_func["Bellman-Ford"] = new BellmanFordSearch();
-    search_func["A-Star"] = new AStarSearch();
-    search_func["Greedy Best-First-Search"] = new GBestFirstSearch();
-
-    auto current_search = search_func.begin();
+    // shapes to draw grid and graph
     sf::CircleShape circle(1);
     circle.setFillColor(sf::Color::Black);
     circle.setOrigin(circle.getGlobalBounds().width / 2, circle.getGlobalBounds().height / 2);
@@ -84,13 +76,14 @@ void GraphDisplay::run() {
     rectangleShape.setOutlineThickness(1);
     rectangleShape.setOutlineColor(sf::Color::Black);
 
-
+    // colors to color nodes
     sf::Color free_color = sf::Color(100, 255, 100);
     sf::Color taken_color = sf::Color(100, 100, 255);
     sf::Color start_color = sf::Color(255, 0, 0);
     sf::Color end_color = sf::Color(255, 0, 100);
     sf::Color on_path = sf::Color(79, 26, 60);
-    graph = std::make_shared<Graph>();
+
+    // create grid
     int side_length = 16; // in pixels
     float half_length = side_length / 2.f;
     int grid_width = SCREEN_WIDTH / side_length;
@@ -98,20 +91,22 @@ void GraphDisplay::run() {
     rectangleShape.setSize({side_length, side_length});
     Grid grid = Grid(grid_width, std::vector<graph::Vertex *>(grid_height));
 
+    // create grid and add vertices to graph (without connections)
     init_grid_graph(grid, free_color, side_length, grid_width, grid_height);
-    Graph &g = *graph;
 
+    // connect all vertices with neighbour vertices on grid
     connect_grid(grid_width, grid_height, grid);
 
-
+    // start and end position used for searching
     graph::Vertex *start = nullptr;
     graph::Vertex *end = nullptr;
 
-    bool *lock_step = new bool();
-    *lock_step = false;
+    // pass lock_step to all search algorithms
+    // in order to change the mode with key presses
     for (auto &search: search_func) {
         search.second->lock_step = lock_step;
     }
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -122,13 +117,13 @@ void GraphDisplay::run() {
                 case sf::Event::KeyPressed:
                     if (event.key.code == sf::Keyboard::Escape) {
                         window.close();
-                    } else if (event.key.code == sf::Keyboard::R) {
+                    } else if (event.key.code == sf::Keyboard::R) { // reset map, clear connections
                         reset(free_color, *graph, start, end);
                         for (auto &adj: graph->get_adjacencies()) {
                             adj.clear();
                         }
                         connect_grid(grid_width, grid_height, grid);
-                    } else if (event.key.code == sf::Keyboard::T) {
+                    } else if (event.key.code == sf::Keyboard::T) { // reset map/graph but keep obstacles
                         for (auto &v :graph->get_vertices()) {
                             if (v->type != graph::Type::occupied) {
                                 v->pred = nullptr;
@@ -138,7 +133,7 @@ void GraphDisplay::run() {
                         }
                         start = nullptr;
                         end = nullptr;
-                    } else if (event.key.code == sf::Keyboard::M) {
+                    } else if (event.key.code == sf::Keyboard::M) { // create a maze with dfs on sepearate thread
                         reset(free_color, *graph, start, end);
                         sf::Clock clock;
                         srand(time((time_t *) clock.getElapsedTime().asMilliseconds()));
@@ -147,18 +142,19 @@ void GraphDisplay::run() {
                         }
                         std::thread maze_thread(create_maze, std::ref(grid), std::ref(*graph), 0, 0, 2);
                         maze_thread.detach();
-                    } else if (event.key.code == sf::Keyboard::Right) {
+                    } else if (event.key.code == sf::Keyboard::Right) { // cycle through search algorithms
                         current_search++;
                         if (current_search == search_func.end()) current_search = search_func.begin();
-                    } else if (event.key.code == sf::Keyboard::Left) {
+                    } else if (event.key.code == sf::Keyboard::Left) { // cycle through search algorithms
                         if (current_search == search_func.begin()) current_search = search_func.end();
                         current_search--;
-                    } else if (event.key.code == sf::Keyboard::L) {
+                    } else if (event.key.code == sf::Keyboard::L) { // lock search algorithm in other thread
                         current_search->second->locked = true;
-                    } else if (event.key.code == sf::Keyboard::U) {
+                    } else if (event.key.code == sf::Keyboard::U) { // unlock search algorithm in other thread
                         current_search->second->locked = false;
                         current_search->second->var.notify_one();
-                    } else if (event.key.code == sf::Keyboard::P) {
+                    } else if (event.key.code ==
+                               sf::Keyboard::P) { // change lock step mode (if true every step in algorithm gets locked)
                         *lock_step = *lock_step ? false : true;
                         if (!*lock_step) {
                             current_search->second->locked = false;
@@ -171,21 +167,22 @@ void GraphDisplay::run() {
                 case sf::Event::MouseButtonPressed:
                     if (event.mouseButton.button == sf::Mouse::Button::Left &&
                         (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl) ||
-                         sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RControl))) {
+                         sf::Keyboard::isKeyPressed(
+                                 sf::Keyboard::Key::RControl))) { // if control is down set start or end
                         int x = event.mouseButton.x * (1.f / side_length);
                         int y = event.mouseButton.y * (1.f / side_length);
-                        if (!start) {
+                        if (!start) { // if start not set, set it at mouse pos
                             start = grid[x][y];
                             start->color = start_color;
                             start->type = graph::Type::start;
-                        } else if (!end) {
+                        } else if (!end) { // if start set but end not, set it at mouse pos
                             end = grid[x][y];
                             end->type = graph::Type::end;
                             end->color = end_color;
                             std::thread t1(run_search, current_search->second, std::ref(*graph), start, end,
                                            std::ref(on_path));
                             t1.detach();
-                        } else {
+                        } else { // if start and end have been set and CTRL is still down, choose new end node and color shortest path again
                             end->type = graph::Type::free;
                             end->color = free_color;
                             graph::Vertex *path_v = end;
@@ -200,7 +197,7 @@ void GraphDisplay::run() {
                             end->color = end_color;
                             color(end, on_path);
                         }
-                    } else {
+                    } else { // if CTRL is not down, create an obstacle and remove connections in graph
                         int x = event.mouseButton.x;
                         int y = event.mouseButton.y;
                         if (inside_grid(side_length, grid, x, y)) {
@@ -216,6 +213,8 @@ void GraphDisplay::run() {
                 case sf::Event::MouseButtonReleased:
                     break;
                 case sf::Event::MouseMoved:
+                    // if mouse is moved while holding CTRL down, the cell under the mouse is deleted
+                    // and connections in graph are removed to create obstacle / barrier
                     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) &&
                         !(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) ||
                           sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))) {
@@ -233,15 +232,27 @@ void GraphDisplay::run() {
             }
         }
         window.clear();
-
         gridDrawer.draw(*graph, window, grid, circle, rectangleShape, half_length);
-
-        text.setPosition(10, 10);
-        text.setString(current_search->first);
+        drawText();
         window.draw(text);
 
         window.display();
     }
+}
+
+void GraphDisplay::drawText() {
+    text.setPosition(10, 10);
+    text.setString(current_search->first);
+}
+
+void GraphDisplay::createSearches() {
+    search_func["Dijkstra"] = new DijkstraSearch();
+    search_func["DFS"] = new DFSSearch();
+    search_func["BFS"] = new BFSSearch();
+    search_func["Bellman-Ford"] = new BellmanFordSearch();
+    search_func["A-Star"] = new AStarSearch();
+    search_func["Greedy Best-First-Search"] = new GBestFirstSearch();
+    current_search = search_func.begin();
 }
 
 bool GraphDisplay::inside_grid(int side_length, const Grid &grid, int &x, int &y) const {
