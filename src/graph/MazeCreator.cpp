@@ -148,7 +148,6 @@ void MazeCreator::createMaze(Grid &grid, Graph &graph, int x_start, int y_start,
 
     for (auto &v: graph.get_vertices()) {
         if (v->type != graph::Type::maze_field) {
-            v->color = sf::Color::Blue;
             v->type = graph::Type::occupied;
         } else {
             v->pred = nullptr;

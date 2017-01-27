@@ -90,7 +90,6 @@ void GraphDisplay::run() {
                         for (auto &v :graph->get_vertices()) {
                             if (v->type != graph::Type::occupied) {
                                 v->pred = nullptr;
-                                v->color = colors[graph::Type::free];
                                 v->type = graph::Type::free;
                             }
                         }
@@ -129,36 +128,29 @@ void GraphDisplay::run() {
                         int y = event.mouseButton.y * (1.f / side_length);
                         if (!start) { // if start not set, set it at mouse pos
                             start = grid[x][y];
-                            start->color = colors[graph::Type::start];
                             start->type = graph::Type::start;
                         } else if (!end) { // if start set but end not, set it at mouse pos
                             end = grid[x][y];
                             end->type = graph::Type::end;
-                            end->color = colors[graph::Type::end];
-                            std::thread t1(run_search, current_search->second, std::ref(*graph), start, end,
-                                           std::ref(colors[graph::Type::on_path]));
+                            std::thread t1(run_search, current_search->second, std::ref(*graph), start, end);
                             t1.detach();
                         } else { // if start and end have been set and CTRL is still down, choose new end node and color shortest path again
                             end->type = graph::Type::free;
-                            end->color = colors[graph::Type::free];
                             graph::Vertex *path_v = end;
                             // remove color of old path
                             while ((path_v = path_v->pred)) {
                                 if (path_v->type == graph::Type::start) break;
                                 path_v->type = graph::Type::free;
-                                path_v->color = colors[graph::Type::free];
                             }
 
                             end = grid[x][y];
                             end->type = graph::Type::end;
-                            end->color = colors[graph::Type::end];
-                            color(end, colors[graph::Type::on_path]);
                         }
                     } else { // if CTRL is not down, create an obstacle and remove connections in graph
                         int x = event.mouseButton.x;
                         int y = event.mouseButton.y;
                         if (inside_grid(side_length, grid, x, y)) {
-                            grid[x][y]->color = colors[graph::Type::occupied];
+                            grid[x][y]->type = graph::Type::occupied;
                             Command *delete_action = new DeleteConnectionAction(*graph,
                                                                                 sf::Vector2i(x, y),
                                                                                 grid[x][y]);
@@ -179,7 +171,7 @@ void GraphDisplay::run() {
                         int x = event.mouseMove.x;
                         int y = event.mouseMove.y;
                         if (inside_grid(side_length, grid, x, y)) {
-                            grid[x][y]->color = colors[graph::Type::occupied];
+                            grid[x][y]->type = graph::Type::occupied;
                             Command *delete_action = new DeleteConnectionAction(*graph, sf::Vector2i(x, y), grid[x][y]);
                             delete_action->do_action();
                             commands.push_back(delete_action);
@@ -259,7 +251,7 @@ void GraphDisplay::init_grid_graph(Grid &grid, const sf::Color &free_color, int 
     for (auto y = 0; y < grid_height; y++) {
         for (auto x = 0; x < grid_width; x++) {
             graph::Vertex *vertex = new graph::Vertex(x * side_length, y * side_length);
-            vertex->color = free_color;
+            vertex->type = graph::Type::free;
             grid[x][y] = vertex;
             graph->add(vertex);
         }
@@ -271,7 +263,6 @@ void GraphDisplay::reset(const sf::Color &free_color, Graph &graph, graph::Verte
                          graph::Vertex *&end) {
     for (auto &v :graph.get_vertices()) {
         v->pred = nullptr;
-        v->color = free_color;
         v->type = graph::Type::free;
     }
     start = nullptr;
@@ -294,20 +285,19 @@ int clamp(int x, int min, int max) {
     return std::min(std::max(x, min), max);
 }
 
-void color(graph::Vertex *end, sf::Color &on_path) {
+void color(graph::Vertex *end) {
     graph::Vertex *current = end;
     while ((current = current->pred)) {
 
         if (current->type != graph::Type::start && current->type != graph::Type::end) {
             current->type = graph::Type::on_path;
-            current->color = on_path;
         }
     }
 }
 
-void run_search(GraphSearch *search, Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path) {
+void run_search(GraphSearch *search, Graph &graph, graph::Vertex *start, graph::Vertex *end) {
     search->search(graph, *start, *end);
-    color(end, on_path);
+    color(end);
 }
 
 void create_maze(Grid &grid, Graph &graph, int start_x, int start_y, int step_size) {

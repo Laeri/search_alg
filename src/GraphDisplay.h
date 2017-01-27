@@ -70,8 +70,8 @@ public:
     void createText();
 };
 
-void color(graph::Vertex *end, sf::Color &on_path);
-void run_search(GraphSearch *search, Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path);
+void color(graph::Vertex *end);
+void run_search(GraphSearch *search, Graph &graph, graph::Vertex *start, graph::Vertex *end);
 int clamp(int x, int min, int max);
 void create_maze(Grid &grid, Graph &graph, int start_x, int start_y, int step_size);
 #endif //SEARCH_ALG_GRAPHDISPLAY_H

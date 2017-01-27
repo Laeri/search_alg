@@ -19,11 +19,11 @@ void DFSSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) {
         while (!tmp.empty()) {
             int i = std::rand() % tmp.size();
             graph::Vertex *branch = graph.get_vertices()[tmp[i].first];
-            callback(Event::Relax, branch);
-            //std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
             if (!branch->pred) {
                 v_stack.push(branch);
                 branch->pred = current;
+                callback(Event::Relax, branch);
             }
             tmp.erase(tmp.begin() + i);
         }

@@ -14,7 +14,6 @@ namespace graph {
     class Vertex {
     public:
         sf::Vector2f position;
-        sf::Color color;
         float distance = 0;
         Type type = Type::free;
 
