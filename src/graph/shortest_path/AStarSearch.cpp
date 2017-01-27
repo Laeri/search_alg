@@ -7,6 +7,12 @@
 #include <mutex>
 #include "AStarSearch.h"
 
+AStarSearch::AStarSearch(Heuristic *heuristic) : heuristic(heuristic) {}
+
+AStarSearch::~AStarSearch() {
+    delete heuristic;
+}
+
 void AStarSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) {
     init_single_src(graph, src);
     std::vector<graph::Vertex *> open;
@@ -14,7 +20,7 @@ void AStarSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) 
 
     std::map<graph::Vertex *, float> g_cost;
     std::map<graph::Vertex *, float> h_cost;
-    std::map<graph::Vertex*, float> f_cost;
+    std::map<graph::Vertex *, float> f_cost;
 
     open.push_back(&src);
     graph::Vertex *current;
@@ -48,10 +54,8 @@ void AStarSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) 
             if (std::find(closed.begin(), closed.end(), node) == closed.end()) { // not in closed
                 float g = g_cost[current] + pair.second;
                 // calculate h cost
-                float dx = node->position.x - goal.position.x;
-                float dy = node->position.y - goal.position.y;
-                float h = std::sqrt(dx * dx + dy * dy);
-                float f = g+h;
+                float h = heuristic->apply(*node, goal);
+                float f = g + h;
                 if (std::find(open.begin(), open.end(), node) == open.end()) { // not yet in open, so add it
                     node->pred = current;
                     open.push_back(node);
@@ -61,7 +65,7 @@ void AStarSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) 
                     f_cost[node] = f;
                     callback(Event::Relax, node);
                 } else { // check if g cost is lower than g cost present, if so update cost and parent if child node
-                    if(g < g_cost[node]){
+                    if (g < g_cost[node]) {
                         node->pred = current;
                         node->distance = f;
                         g_cost[node] = g;
