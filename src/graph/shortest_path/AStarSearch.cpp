@@ -48,14 +48,14 @@ void AStarSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) 
                     node->distance = f;
                     g_cost[node] = g;
                     callback(Event::Relax, node);
-                    std::sort(open.begin(), open.end(), compare());
+                    std::sort(open.begin(), open.end(), sort_vector());
                 } else { // check if g cost is lower than g cost present, if so update cost and parent if child node
                     if (g < g_cost[node]) {
                         node->pred = current;
                         node->distance = f;
                         g_cost[node] = g;
                         callback(Event::Relax, node);
-                        std::sort(open.begin(), open.end(),compare());
+                        std::sort(open.begin(), open.end(),sort_vector());
                     }
                 }
 

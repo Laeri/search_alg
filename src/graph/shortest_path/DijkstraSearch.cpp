@@ -13,7 +13,7 @@ void DijkstraSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goa
     for (graph::Vertex *vertex: graph.get_vertices()) {
         Q.push_back(vertex);
     }
-    std::sort(Q.begin(), Q.end(), compare());
+    std::sort(Q.begin(), Q.end(), sort_vector());
     while (!Q.empty()) {
         graph::Vertex *u = Q[0];
         callback(Event::Current, u);
@@ -24,7 +24,7 @@ void DijkstraSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goa
             float weight = pair.second;
             bool resort_queue = v->distance > u->distance + weight;
             relax(*u, *v, weight);
-            if (resort_queue) std::sort(Q.begin(), Q.end(), compare());
+            if (resort_queue) std::sort(Q.begin(), Q.end(), sort_vector());
         }
 
     }

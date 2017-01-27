@@ -13,7 +13,7 @@ void GBestFirstSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &g
     * do not change after insertion
     */
 
-    std::priority_queue<graph::Vertex *, std::vector<graph::Vertex *>, compare> open;
+    std::priority_queue<graph::Vertex *, std::vector<graph::Vertex *>, compare_queue> open;
     // set predecessor to dummy value (points back to itself)
     src.pred = &src;
     open.push(&src);

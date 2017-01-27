@@ -15,10 +15,17 @@ enum class Event {
     Current, Relax
 };
 
-struct compare {
+struct sort_vector {
     bool operator()(const graph::Vertex* u, const graph::Vertex* v){
         // > because first element in vector shall be minimum element when using std::sort
         return u->distance < v->distance;
+    }
+};
+
+struct compare_queue {
+    bool operator()(const graph::Vertex* u, const graph::Vertex* v){
+        // > because first element in vector shall be minimum element when using std::sort
+        return u->distance > v->distance;
     }
 };
 
