@@ -81,7 +81,7 @@ void GraphDisplay::run() {
 
     init_grid_graph(grid, free_color, side_length, grid_width, grid_height);
     Graph &g = *graph;
-    mazeCreator.createMaze(grid, *graph,0,0);
+    mazeCreator.createMaze(grid, *graph,0,0, 2);
     //connect_grid(grid_width, grid_height, grid);
 
 
