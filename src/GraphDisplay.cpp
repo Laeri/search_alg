@@ -8,6 +8,7 @@
 #include <memory>
 #include <SFML/Window/Event.hpp>
 #include <thread>
+#include <iostream>
 #include "GraphDisplay.h"
 #include "graph/Graph.h"
 #include "Command.h"
@@ -41,18 +42,6 @@ void color(graph::Vertex *end, sf::Color &on_path) {
     }
 }
 
-void run_and_color(Grid &grid, Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path) {
-    //bellman_ford::bellman_ford(graph, *start);
-    // Dijkstra::dijkstra(graph, *start);
-    // dfs::dfs_search(graph, *start);
-    // dfs::dfs_it(graph, *start);
-    // dfs::dfs_maze(grid, graph, *start);
-    //   best_first::best_first_search(graph, *start, *end);
-    //bfs::bfs_search(graph, *start);
-    // a_star::a_star_search(graph, *start, *end);
-    color(end, on_path);
-}
-
 void run_search(GraphSearch *search, Graph &graph, graph::Vertex *start, graph::Vertex *end, sf::Color &on_path) {
     search->search(graph, *start, *end);
     color(end, on_path);
@@ -69,6 +58,15 @@ void GraphDisplay::run() {
 
     std::map<std::string, GraphSearch *> search_func;
 
+
+    sf::Font font;
+    if (!font.loadFromFile("Rubik-Regular.ttf")) {
+        std::cout << "Font could not be found" << std::endl;
+    }
+    sf::Text text;
+    text.setFont(font);
+    text.setCharacterSize(24);
+    text.setColor(sf::Color::Black);
 
     search_func["Dijkstra"] = new DijkstraSearch();
     search_func["DFS"] = new DFSSearch();
@@ -143,6 +141,12 @@ void GraphDisplay::run() {
                         }
                         std::thread maze_thread(create_maze, std::ref(grid), std::ref(*graph), 0, 0, 2);
                         maze_thread.detach();
+                    } else if (event.key.code == sf::Keyboard::Right) {
+                        current_search++;
+                        if (current_search == search_func.end()) current_search = search_func.begin();
+                    } else if (event.key.code == sf::Keyboard::Left) {
+                        if (current_search == search_func.begin()) current_search = search_func.end();
+                        current_search--;
                     }
                     break;
                 case sf::Event::KeyReleased:
@@ -214,6 +218,10 @@ void GraphDisplay::run() {
         window.clear();
 
         gridDrawer.draw(*graph, window, grid, circle, rectangleShape, half_length);
+
+        text.setPosition(10, 10);
+        text.setString(current_search->first);
+        window.draw(text);
 
         window.display();
     }
