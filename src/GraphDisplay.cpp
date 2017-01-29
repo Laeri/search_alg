@@ -39,7 +39,7 @@ void GraphDisplay::run() {
     // colors to color nodes
     std::map<graph::Type, sf::Color> colors = {
             {graph::Type::free,            sf::Color(100, 255, 100)},
-            {graph::Type::being_processed, sf::Color::White},
+            {graph::Type::processed, sf::Color::White},
             {graph::Type::start,           sf::Color(255, 0, 0)},
             {graph::Type::end,             sf::Color(255, 0, 100)},
             {graph::Type::on_path,         sf::Color(79, 26, 60)},
@@ -65,8 +65,8 @@ void GraphDisplay::run() {
     // connect all vertices with neighbour vertices on grid
     connect_grid(grid_width, grid_height, grid, side_length);
 
-    PrimMST primMST = PrimMST();
-    primMST.build(*graph, *(graph->get_vertices()[0]));
+    //PrimMST primMST = PrimMST();
+    //primMST.build(*graph, *(graph->get_vertices()[0]));
 
     // start and end position used for searching
     graph::Vertex *start = nullptr;
@@ -141,6 +141,7 @@ void GraphDisplay::run() {
                             }
                             break;
                         case sf::Keyboard::N:
+                            reset(*graph, start, end);
                             KruskalMST kruskalMST = KruskalMST();
                             graph::Vertex *root = graph->get_vertices()[0];
                             kruskalMST.build(*graph, *root);
@@ -165,12 +166,12 @@ void GraphDisplay::run() {
                             std::thread t1(run_search, current_search->second, std::ref(*graph), start, end);
                             t1.detach();
                         } else { // if start and end have been set and CTRL is still down, choose new end node and color shortest path again
-                            end->type = graph::Type::being_processed;
+                            end->type = graph::Type::processed;
                             graph::Vertex *path_v = end;
                             // remove old path / set its type to Type::free
                             while ((path_v = path_v->pred)) {
                                 if (path_v->type == graph::Type::start) break;
-                                path_v->type = graph::Type::being_processed;
+                                path_v->type = graph::Type::processed;
                             }
 
                             end = grid[x][y];
@@ -250,7 +251,7 @@ void GraphDisplay::createSearches() {
     search_func["DFS"] = new DFSSearch();
     search_func["BFS"] = new BFSSearch();
     search_func["Bellman-Ford"] = new BellmanFordSearch();
-    search_func["A-Star"] = new AStarSearch(new EuclideanDistance());
+    search_func["A-Star"] = new AStarSearch(new ManhattenDistance());
     search_func["Greedy Best-First-Search"] = new GBestFirstSearch();
     current_search = search_func.begin();
 }

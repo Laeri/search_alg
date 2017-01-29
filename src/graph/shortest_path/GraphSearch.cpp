@@ -19,7 +19,7 @@ GraphSearch::GraphSearch() {
             case Event::Current:
                 if ((node->type != graph::Type::start) && (node->type != graph::Type::end) &&
                     (node->type != graph::Type::occupied)) {
-                    node->type = graph::Type::being_processed;
+                    node->type = graph::Type::processed;
                     std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 }
                 break;

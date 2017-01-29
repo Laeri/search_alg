@@ -38,6 +38,6 @@ void KruskalMST::build(Graph &graph, graph::Vertex &root) {
     }
 
     for(auto &vertex: graph.get_vertices()){
-
+        vertex->type = graph::Type ::maze_field;
     }
 }
