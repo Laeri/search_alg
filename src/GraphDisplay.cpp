@@ -24,6 +24,7 @@
 #include "graph/shortest_path/heuristic/ManhattenDistance.h"
 #include "graph/shortest_path/heuristic/DiagonalDistance.h"
 #include "graph/KruskalMST.h"
+#include "graph/PrimMST.h"
 
 
 GraphDisplay::GraphDisplay() {}
@@ -64,7 +65,8 @@ void GraphDisplay::run() {
     // connect all vertices with neighbour vertices on grid
     connect_grid(grid_width, grid_height, grid, side_length);
 
-
+    PrimMST primMST = PrimMST();
+    primMST.build(*graph, *(graph->get_vertices()[0]));
 
     // start and end position used for searching
     graph::Vertex *start = nullptr;
@@ -140,7 +142,7 @@ void GraphDisplay::run() {
                             break;
                         case sf::Keyboard::N:
                             KruskalMST kruskalMST = KruskalMST();
-                            graph::Vertex* root = graph->get_vertices()[0];
+                            graph::Vertex *root = graph->get_vertices()[0];
                             kruskalMST.build(*graph, *root);
                             break;
                     }
@@ -194,7 +196,7 @@ void GraphDisplay::run() {
                         int x = event.mouseMove.x;
                         int y = event.mouseMove.y;
                         if (inside_grid(side_length, grid, x, y)) {
-                            deleteConnections(grid, x,y);
+                            deleteConnections(grid, x, y);
                         }
                     }
                     break;
@@ -266,7 +268,7 @@ void GraphDisplay::connect_grid(int grid_width, int grid_height, const Grid &gri
                 int coord_x = clamp(i + pair.first, 0, grid_width - 1);
                 int coord_y = clamp(j + pair.second, 0, grid_height - 1);
                 if (!(i == coord_x && j == coord_y)) {
-                    sf::Vector2f dPos = sf::Vector2f((i - coord_x)*grid_length, (j - coord_y)*grid_length);
+                    sf::Vector2f dPos = sf::Vector2f((i - coord_x) * grid_length, (j - coord_y) * grid_length);
                     float dist = std::sqrt(dPos.x * dPos.x + dPos.y * dPos.y);
                     graph->bi_connect(grid[i][j], grid[coord_x][coord_y], dist);
                 }
