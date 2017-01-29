@@ -23,6 +23,7 @@
 #include "graph/shortest_path/heuristic/EuclideanDistance.h"
 #include "graph/shortest_path/heuristic/ManhattenDistance.h"
 #include "graph/shortest_path/heuristic/DiagonalDistance.h"
+#include "graph/KruskalMST.h"
 
 
 GraphDisplay::GraphDisplay() {}
@@ -62,6 +63,8 @@ void GraphDisplay::run() {
     init_grid_graph(grid, colors[graph::Type::free], side_length, grid_width, grid_height);
     // connect all vertices with neighbour vertices on grid
     connect_grid(grid_width, grid_height, grid, side_length);
+
+
 
     // start and end position used for searching
     graph::Vertex *start = nullptr;
@@ -134,6 +137,11 @@ void GraphDisplay::run() {
                                 current_search->second->locked = false;
                                 current_search->second->var.notify_one();
                             }
+                            break;
+                        case sf::Keyboard::N:
+                            KruskalMST kruskalMST = KruskalMST();
+                            graph::Vertex* root = graph->get_vertices()[0];
+                            kruskalMST.build(*graph, *root);
                             break;
                     }
 
