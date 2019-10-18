@@ -7,6 +7,7 @@
 
 #include <vector>
 #include "Vertex.h"
+#include <functional>
 
 typedef std::vector<std::pair<int, float>> ADJ_V;
 typedef std::vector<ADJ_V> Adjacency;

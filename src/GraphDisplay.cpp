@@ -25,7 +25,7 @@
 #include "graph/shortest_path/heuristic/DiagonalDistance.h"
 #include "graph/KruskalMST.h"
 #include "graph/PrimMST.h"
-
+#include <cmath>
 
 GraphDisplay::GraphDisplay() {}
 
@@ -88,6 +88,9 @@ void GraphDisplay::run() {
                 case sf::Event::KeyPressed:
                     switch (event.key.code) {
                         case sf::Keyboard::Escape:
+                            window.close();
+                            break;
+                        case sf::Keyboard::Q:
                             window.close();
                             break;
                             // reset map, clear connections

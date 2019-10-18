@@ -15,7 +15,7 @@ void PrimMST::build(Graph &graph, graph::Vertex &root) {
         v->distance = std::numeric_limits<float>::max();
     }
     std::vector<graph::Vertex*> v_list = std::vector<graph::Vertex*>(graph.get_vertices().begin(), graph.get_vertices().end());
-    DisjointSet set = DisjointSet(graph.get_vertices());
+    DisjointSet set = DisjointSet();
     while(!v_list.empty()){
         std::sort(v_list.begin(), v_list.end(), compare_vertex());
         graph::Vertex* vertex = *v_list.begin();

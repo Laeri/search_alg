@@ -27,7 +27,7 @@ void KruskalMST::build(Graph &graph, graph::Vertex &root) {
 
     std::sort(edges.begin(), edges.end(), edge_compare());
 
-    DisjointSet set = DisjointSet(graph.get_vertices());
+    DisjointSet set = DisjointSet();
     for (auto &edge: edges) {
         if (!set.same_set(edge.v1, edge.v2)) {
             graph.bi_connect(edge.v1, edge.v2, edge.cost);

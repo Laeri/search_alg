@@ -4,7 +4,7 @@
 
 #include "DisjointSet.h"
 
-DisjointSet::DisjointSet(std::vector<graph::Vertex *> &vertices) {
+DisjointSet::DisjointSet() {
 }
 
 void DisjointSet::merge(graph::Vertex *u, graph::Vertex *v) {

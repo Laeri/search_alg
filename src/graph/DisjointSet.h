@@ -10,7 +10,7 @@
 
 class DisjointSet {
 public:
-    DisjointSet(std::vector<graph::Vertex*> &vertices);
+    DisjointSet();
     void merge(graph::Vertex* u, graph::Vertex* v);
     graph::Vertex* find(graph::Vertex* u);
     bool same_set(graph::Vertex* u, graph::Vertex* v);

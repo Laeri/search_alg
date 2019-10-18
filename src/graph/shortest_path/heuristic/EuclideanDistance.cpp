@@ -3,6 +3,7 @@
 //
 
 #include "EuclideanDistance.h"
+#include <cmath>
 
 float EuclideanDistance::apply(graph::Vertex &node, graph::Vertex &goal) {
     sf::Vector2f delta = goal.position - node.position;

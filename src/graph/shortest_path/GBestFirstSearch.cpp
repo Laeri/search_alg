@@ -5,7 +5,7 @@
 #include <thread>
 #include <queue>
 #include "GBestFirstSearch.h"
-
+#include <cmath>
 
 void GBestFirstSearch::search(Graph &graph, graph::Vertex &src, graph::Vertex &goal) {
 
