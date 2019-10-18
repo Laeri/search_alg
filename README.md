@@ -10,10 +10,7 @@ You could basically use this as a pixel art drawing tool.
 Draw some nice images and run the search algorithm through it.
 
 ![Demo: DFS](examples/example_dfs.gif)
-![Demo: A-Star](examples/example_a-star.gif)
-![Demo: Dijkstra](examples/example_dijkstra.gif)
 ![Demo: Mazes](examples/example_mazes.gif)
-
 
 ## Getting Started
 
