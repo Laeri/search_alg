@@ -60,8 +60,8 @@ On ubuntu: libsfml-dev
 3. Lock by pressing <kbd>l</kbd>
 4. Set manual stepping mode by pressing <kbd>p</kbd>
 5. Step through the algorithm by repeatedly pressing <kbd>u</kbd>, each key press does one step.
-6. Press </kbd>p</kbd> to get out of manual mode
-7. Unlock with </kbd>u</kbd>
+6. Press <kbd>p</kbd> to get out of manual mode
+7. Unlock with <kbd>u</kbd>
 
 ### Keybindings
 <kbd>s</kbd> - starts or stops the tree expansion
