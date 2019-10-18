@@ -1,8 +1,11 @@
 cmake-build-debug/
+
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
+bin/*
 ./MakeFile
+
 # binary
 ./search_alg
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
